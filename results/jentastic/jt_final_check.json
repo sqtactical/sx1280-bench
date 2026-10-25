@@ -1,0 +1,83 @@
+{
+ "LORA / 200B": {
+  "mode": "LORA",
+  "size": 200,
+  "ack": {
+   "n": 10,
+   "acked": 10,
+   "lat_median_ms": 145.43485641479492
+  },
+  "stream": {
+   "sent": 10,
+   "received": 10,
+   "send_s": 0.0017096996307373047,
+   "total_s": 0.7224082946777344,
+   "kbps": 22.1481399339934
+  },
+  "status": {
+   "A": [
+    "🔴 JT: Alt modem already off (LoRa).",
+    "🔴 JT Alt Modem: LORA BR:0.0k dev:0.0k bw:0.0k pre:0 | caps:FSK FLRC "
+   ],
+   "B": [
+    "🔴 JT: Alt modem already off (LoRa).",
+    "🔴 JT Alt Modem: LORA BR:0.0k dev:0.0k bw:0.0k pre:0 | caps:FSK FLRC "
+   ]
+  },
+  "rssi_median": -31.0
+ },
+ "FLRC 650 2 / 200B": {
+  "mode": "FLRC 650 2",
+  "size": 200,
+  "ack": {
+   "n": 10,
+   "acked": 10,
+   "lat_median_ms": 85.08515357971191
+  },
+  "stream": {
+   "sent": 10,
+   "received": 10,
+   "send_s": 0.002431631088256836,
+   "total_s": 0.3804643154144287,
+   "kbps": 42.05387825287022
+  },
+  "status": {
+   "A": [
+    "🔴 JT: FLRC accepted. BR:650.0k CR:1/2 BT:2 PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FLRC BR:650.0k dev:0.0k bw:0.0k pre:16 | caps:FSK FLRC "
+   ],
+   "B": [
+    "🔴 JT: FLRC accepted. BR:650.0k CR:1/2 BT:2 PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FLRC BR:650.0k dev:0.0k bw:0.0k pre:16 | caps:FSK FLRC "
+   ]
+  },
+  "rssi_median": -32.0
+ },
+ "FSK 1000 / 200B": {
+  "mode": "FSK 1000",
+  "size": 200,
+  "ack": {
+   "n": 10,
+   "acked": 10,
+   "lat_median_ms": 69.15044784545898
+  },
+  "stream": {
+   "sent": 10,
+   "received": 10,
+   "send_s": 0.0012617111206054688,
+   "total_s": 0.32988929748535156,
+   "kbps": 48.501118775186896
+  },
+  "status": {
+   "A": [
+    "🔴 JT: FSK accepted. BR:1000.0k DEV:250.0k BW:467.0k PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FSK BR:1000.0k dev:250.0k bw:467.0k pre:16 | caps:FSK FLRC "
+   ],
+   "B": [
+    "🔴 JT: FSK accepted. BR:1000.0k DEV:250.0k BW:467.0k PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FSK BR:1000.0k dev:250.0k bw:467.0k pre:16 | caps:FSK FLRC "
+   ]
+  },
+  "rssi_median": -32.0
+ }
+}

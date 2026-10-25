@@ -1,0 +1,36 @@
+{
+ "size": 102400,
+ "pwr": 0,
+ "results": [
+  {
+   "mode": "260k CR1/2",
+   "br_kbps": 260,
+   "cr": "1/2",
+   "eff_kbps": 130.0,
+   "burst": {
+    "n": 191,
+    "rx": 191,
+    "loss_pct": 0.0,
+    "crc": 0,
+    "rssi": -36,
+    "pkt_us": 8567.287958115183,
+    "toa127_us": 8311,
+    "raw_kbps": 118.59062108886108,
+    "raw_good_kbps": 114.85548341677097
+   },
+   "file": {
+    "sha_ok": true,
+    "tx_kbps": 114.2,
+    "rx_kbps": 114.2,
+    "host_kbps": 113.70994979270019,
+    "host_s": 7.204294800001662,
+    "pkts": 833,
+    "retx": 0,
+    "polls": 0,
+    "tmos": 0,
+    "crcerr": 0,
+    "rssi": -36
+   }
+  }
+ ]
+}

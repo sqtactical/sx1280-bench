@@ -1,0 +1,272 @@
+{
+ "LORA / 200B": {
+  "mode": "LORA",
+  "size": 200,
+  "ack": {
+   "n": 20,
+   "acked": 20,
+   "lat_median_ms": 220.05844116210938
+  },
+  "stream": {
+   "sent": 20,
+   "received": 20,
+   "send_s": 1.0056071281433105,
+   "total_s": 1.190866231918335,
+   "kbps": 26.87119606074651
+  },
+  "status": {
+   "A": [
+    "🔴 JT: Alt modem already off (LoRa).",
+    "🔴 JT Alt Modem: LORA BR:0.0k dev:0.0k bw:0.0k pre:0 | caps:FSK FLRC "
+   ],
+   "B": [
+    "🔴 JT: Alt modem already off (LoRa).",
+    "🔴 JT Alt Modem: LORA BR:0.0k dev:0.0k bw:0.0k pre:0 | caps:FSK FLRC "
+   ]
+  },
+  "rssi_median": -33.0
+ },
+ "FLRC 1300 4 / 200B": {
+  "mode": "FLRC 1300 4",
+  "size": 200,
+  "ack": {
+   "n": 20,
+   "acked": 20,
+   "lat_median_ms": 207.13472366333008
+  },
+  "stream": {
+   "sent": 20,
+   "received": 20,
+   "send_s": 1.0036234855651855,
+   "total_s": 1.095344066619873,
+   "kbps": 29.214564605940613
+  },
+  "status": {
+   "A": [
+    "🔴 JT: FLRC accepted. BR:1300.0k CR:1/1 BT:2 PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FLRC BR:1300.0k dev:0.0k bw:0.0k pre:16 | caps:FSK FLRC "
+   ],
+   "B": [
+    "🔴 JT: FLRC accepted. BR:1300.0k CR:1/1 BT:2 PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FLRC BR:1300.0k dev:0.0k bw:0.0k pre:16 | caps:FSK FLRC "
+   ]
+  },
+  "rssi_median": -33.0
+ },
+ "FLRC 1300 2 / 200B": {
+  "mode": "FLRC 1300 2",
+  "size": 200,
+  "ack": {
+   "n": 20,
+   "acked": 20,
+   "lat_median_ms": 208.56118202209473
+  },
+  "stream": {
+   "sent": 20,
+   "received": 20,
+   "send_s": 1.006023645401001,
+   "total_s": 1.0903759002685547,
+   "kbps": 29.347677247927567
+  },
+  "status": {
+   "A": [
+    "🔴 JT: FLRC accepted. BR:1300.0k CR:1/2 BT:2 PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FLRC BR:1300.0k dev:0.0k bw:0.0k pre:16 | caps:FSK FLRC "
+   ],
+   "B": [
+    "🔴 JT: FLRC accepted. BR:1300.0k CR:1/2 BT:2 PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FLRC BR:1300.0k dev:0.0k bw:0.0k pre:16 | caps:FSK FLRC "
+   ]
+  },
+  "rssi_median": -33.0
+ },
+ "FLRC 650 2 / 200B": {
+  "mode": "FLRC 650 2",
+  "size": 200,
+  "ack": {
+   "n": 20,
+   "acked": 0,
+   "lat_median_ms": null
+  },
+  "stream": {
+   "sent": 20,
+   "received": 0,
+   "send_s": 1.0050523281097412,
+   "total_s": 7.011384725570679,
+   "kbps": 0
+  },
+  "status": {
+   "A": [
+    "🔴 JT: FLRC accepted. BR:650.0k CR:1/2 BT:2 PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FLRC BR:650.0k dev:0.0k bw:0.0k pre:16 | caps:FSK FLRC "
+   ],
+   "B": [
+    "🔴 JT: FLRC accepted. BR:650.0k CR:1/2 BT:2 PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FLRC BR:650.0k dev:0.0k bw:0.0k pre:16 | caps:FSK FLRC "
+   ]
+  },
+  "rssi_median": -33.0
+ },
+ "FLRC 260 2 / 200B": {
+  "mode": "FLRC 260 2",
+  "size": 200,
+  "ack": {
+   "n": 20,
+   "acked": 20,
+   "lat_median_ms": 196.47133350372314
+  },
+  "stream": {
+   "sent": 20,
+   "received": 20,
+   "send_s": 1.0041720867156982,
+   "total_s": 1.155773401260376,
+   "kbps": 27.687088113555703
+  },
+  "status": {
+   "A": [
+    "🔴 JT: FLRC accepted. BR:260.0k CR:1/2 BT:2 PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FLRC BR:260.0k dev:0.0k bw:0.0k pre:16 | caps:FSK FLRC "
+   ],
+   "B": [
+    "🔴 JT: FLRC accepted. BR:260.0k CR:1/2 BT:2 PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FLRC BR:260.0k dev:0.0k bw:0.0k pre:16 | caps:FSK FLRC "
+   ]
+  },
+  "rssi_median": -33.0
+ },
+ "FLRC 650 3 2 32 / 200B": {
+  "mode": "FLRC 650 3 2 32",
+  "size": 200,
+  "ack": {
+   "n": 20,
+   "acked": 20,
+   "lat_median_ms": 183.85004997253418
+  },
+  "stream": {
+   "sent": 20,
+   "received": 19,
+   "send_s": 1.004671573638916,
+   "total_s": 1.084641933441162,
+   "kbps": 28.027682742775948
+  },
+  "status": {
+   "A": [
+    "🔴 JT: FLRC accepted. BR:650.0k CR:3/4 BT:2 PRE:32. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FLRC BR:650.0k dev:0.0k bw:0.0k pre:32 | caps:FSK FLRC "
+   ],
+   "B": [
+    "🔴 JT: FLRC accepted. BR:650.0k CR:3/4 BT:2 PRE:32. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FLRC BR:650.0k dev:0.0k bw:0.0k pre:32 | caps:FSK FLRC "
+   ]
+  },
+  "rssi_median": -33
+ },
+ "FSK 2000 / 200B": {
+  "mode": "FSK 2000",
+  "size": 200,
+  "ack": {
+   "n": 20,
+   "acked": 20,
+   "lat_median_ms": 614.3213510513306
+  },
+  "stream": {
+   "sent": 20,
+   "received": 20,
+   "send_s": 1.0038628578186035,
+   "total_s": 1.0464799404144287,
+   "kbps": 30.578703675225068
+  },
+  "status": {
+   "A": [
+    "🔴 JT: FSK accepted. BR:2000.0k DEV:500.0k BW:467.0k PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FSK BR:2000.0k dev:500.0k bw:467.0k pre:16 | caps:FSK FLRC "
+   ],
+   "B": [
+    "🔴 JT: FSK accepted. BR:2000.0k DEV:500.0k BW:467.0k PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FSK BR:2000.0k dev:500.0k bw:467.0k pre:16 | caps:FSK FLRC "
+   ]
+  },
+  "rssi_median": -33
+ },
+ "FSK 1000 / 200B": {
+  "mode": "FSK 1000",
+  "size": 200,
+  "ack": {
+   "n": 20,
+   "acked": 20,
+   "lat_median_ms": 355.3727865219116
+  },
+  "stream": {
+   "sent": 20,
+   "received": 20,
+   "send_s": 1.0037682056427002,
+   "total_s": 1.0743467807769775,
+   "kbps": 29.785540918973393
+  },
+  "status": {
+   "A": [
+    "🔴 JT: FSK accepted. BR:1000.0k DEV:250.0k BW:467.0k PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FSK BR:1000.0k dev:250.0k bw:467.0k pre:16 | caps:FSK FLRC "
+   ],
+   "B": [
+    "🔴 JT: FSK accepted. BR:1000.0k DEV:250.0k BW:467.0k PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FSK BR:1000.0k dev:250.0k bw:467.0k pre:16 | caps:FSK FLRC "
+   ]
+  },
+  "rssi_median": -33
+ },
+ "FSK 500 / 200B": {
+  "mode": "FSK 500",
+  "size": 200,
+  "ack": {
+   "n": 20,
+   "acked": 20,
+   "lat_median_ms": 200.93488693237305
+  },
+  "stream": {
+   "sent": 20,
+   "received": 20,
+   "send_s": 1.005072832107544,
+   "total_s": 1.0900444984436035,
+   "kbps": 29.356599703673112
+  },
+  "status": {
+   "A": [
+    "🔴 JT: FSK accepted. BR:500.0k DEV:125.0k BW:467.0k PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FSK BR:500.0k dev:125.0k bw:467.0k pre:16 | caps:FSK FLRC "
+   ],
+   "B": [
+    "🔴 JT: FSK accepted. BR:500.0k DEV:125.0k BW:467.0k PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FSK BR:500.0k dev:125.0k bw:467.0k pre:16 | caps:FSK FLRC "
+   ]
+  },
+  "rssi_median": -33
+ },
+ "FSK 250 / 200B": {
+  "mode": "FSK 250",
+  "size": 200,
+  "ack": {
+   "n": 20,
+   "acked": 20,
+   "lat_median_ms": 176.52559280395508
+  },
+  "stream": {
+   "sent": 20,
+   "received": 20,
+   "send_s": 1.0046982765197754,
+   "total_s": 1.048715353012085,
+   "kbps": 30.513522957483815
+  },
+  "status": {
+   "A": [
+    "🔴 JT: FSK accepted. BR:250.0k DEV:62.5k BW:467.0k PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FSK BR:250.0k dev:62.5k bw:467.0k pre:16 | caps:FSK FLRC "
+   ],
+   "B": [
+    "🔴 JT: FSK accepted. BR:250.0k DEV:62.5k BW:467.0k PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FSK BR:250.0k dev:62.5k bw:467.0k pre:16 | caps:FSK FLRC "
+   ]
+  },
+  "rssi_median": -33
+ }
+}

@@ -1,0 +1,50 @@
+{
+ "modem": "flrc",
+ "pl": 127,
+ "pwr": 0,
+ "opt": "1 1 0x80",
+ "win": 64,
+ "results": [
+  {
+   "mode": "1300k CR1/1",
+   "nominal_kbps": 1300.0,
+   "pl": 127,
+   "toa_us": 859,
+   "burst": {
+    "n": 2705,
+    "rx": 2705,
+    "loss_pct": 0.0,
+    "crc": 0,
+    "rssi": -33,
+    "rawbad": 0,
+    "overrun": 0,
+    "pkt_us": 991.3678373382625,
+    "toa_us": 859,
+    "raw_kbps": 1024.846642925065,
+    "prof": "PROF n=2705 load=111 fire=40 air=938 (toa=859 startup=79) post=10 us/pkt"
+   },
+   "file": {
+    "size": 204800,
+    "sha_ok": true,
+    "tx_kbps": 948.8,
+    "rx_kbps": 948.96,
+    "host_kbps": 929.9116022041455,
+    "host_s": 1.761887900007423,
+    "pkts": 1667,
+    "retx": 1,
+    "polls": 0,
+    "tmos": 0,
+    "crcerr": 0,
+    "overrun": 1,
+    "rssi": -33,
+    "t_start": 1099,
+    "t_data": 1707168,
+    "t_ack": 17578,
+    "t_usbwait": 45,
+    "radio_us": 1726903,
+    "blocks": 27,
+    "prof": "PROF n=1667 load=112 fire=56 air=949 (toa=859 startup=90) post=13 us/pkt"
+   }
+  }
+ ]
+}

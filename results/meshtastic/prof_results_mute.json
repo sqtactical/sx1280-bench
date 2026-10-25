@@ -1,0 +1,1240 @@
+{
+ "GFSK_FAST": {
+  "stream": {
+   "outcome": {
+    "sent": 20,
+    "received": 20,
+    "send_s": 1.003662109375,
+    "total_s": 1.1777489185333252,
+    "kbps": 27.170477082543414
+   },
+   "A": {
+    "window_ms": 1297,
+    "stage": {
+     "api_to_radio": {
+      "n": 20,
+      "avg_us": 1611,
+      "max_us": 1954,
+      "total_ms": 32
+     },
+     "encode": {
+      "n": 20,
+      "avg_us": 927,
+      "max_us": 977,
+      "total_ms": 18
+     },
+     "tx_queue": {
+      "n": 20,
+      "avg_us": 256005,
+      "max_us": 539062,
+      "total_ms": 5120
+     },
+     "tx_air": {
+      "n": 20,
+      "avg_us": 3954,
+      "max_us": 4883,
+      "total_ms": 79
+     },
+     "isr_latency": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "decode": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "modules": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "nodedb_update": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "api_emit": {
+      "n": 5,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "loop_busy": {
+      "n": 24754,
+      "avg_us": 38,
+      "max_us": 60547,
+      "total_ms": 957
+     },
+     "loop_pre": {
+      "n": 24753,
+      "avg_us": 14,
+      "max_us": 977,
+      "total_ms": 361
+     },
+     "loop_threads": {
+      "n": 24754,
+      "avg_us": 21,
+      "max_us": 59570,
+      "total_ms": 527
+     },
+     "loop_gap": {
+      "n": 24754,
+      "avg_us": 11,
+      "max_us": 977,
+      "total_ms": 275
+     }
+    },
+    "thread": {
+     "SerialConsole": {
+      "n": 246,
+      "avg_us": 321,
+      "max_us": 59570,
+      "total_ms": 79
+     },
+     "RadioIf": {
+      "n": 40,
+      "avg_us": 1489,
+      "max_us": 2930,
+      "total_ms": 59
+     },
+     "UserButton": {
+      "n": 13,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "PowerFSM": {
+      "n": 13,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "GPS": {
+      "n": 6,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "StatusLEDModule": {
+      "n": 1,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "AirTime": {
+      "n": 1,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     }
+    },
+    "log_lines": 0
+   },
+   "B": {
+    "window_ms": 1241,
+    "stage": {
+     "isr_latency": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "rx_handle": {
+      "n": 20,
+      "avg_us": 2929,
+      "max_us": 2930,
+      "total_ms": 58
+     },
+     "router_queue": {
+      "n": 20,
+      "avg_us": 976,
+      "max_us": 977,
+      "total_ms": 19
+     },
+     "router_handle": {
+      "n": 20,
+      "avg_us": 48,
+      "max_us": 977,
+      "total_ms": 0
+     },
+     "decode": {
+      "n": 40,
+      "avg_us": 24,
+      "max_us": 977,
+      "total_ms": 0
+     },
+     "modules": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "nodedb_update": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "phone_queue": {
+      "n": 20,
+      "avg_us": 927,
+      "max_us": 977,
+      "total_ms": 18
+     },
+     "api_emit": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "loop_busy": {
+      "n": 24436,
+      "avg_us": 37,
+      "max_us": 3907,
+      "total_ms": 909
+     },
+     "loop_pre": {
+      "n": 24435,
+      "avg_us": 15,
+      "max_us": 977,
+      "total_ms": 384
+     },
+     "loop_threads": {
+      "n": 24436,
+      "avg_us": 19,
+      "max_us": 3907,
+      "total_ms": 477
+     },
+     "loop_gap": {
+      "n": 24436,
+      "avg_us": 10,
+      "max_us": 977,
+      "total_ms": 265
+     }
+    },
+    "thread": {
+     "RadioIf": {
+      "n": 20,
+      "avg_us": 3906,
+      "max_us": 3907,
+      "total_ms": 78
+     },
+     "Router": {
+      "n": 20,
+      "avg_us": 48,
+      "max_us": 977,
+      "total_ms": 0
+     },
+     "SerialConsole": {
+      "n": 21,
+      "avg_us": 325,
+      "max_us": 1954,
+      "total_ms": 6
+     },
+     "GPS": {
+      "n": 7,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "UserButton": {
+      "n": 12,
+      "avg_us": 81,
+      "max_us": 976,
+      "total_ms": 0
+     },
+     "PowerFSM": {
+      "n": 12,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "StatusLEDModule": {
+      "n": 1,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "AirTime": {
+      "n": 1,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "Position": {
+      "n": 1,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     }
+    },
+    "log_lines": 0
+   }
+  },
+  "ack": {
+   "outcome": {
+    "acked": 20,
+    "lat_median_ms": 98.07229042053223
+   },
+   "A": {
+    "window_ms": 2254,
+    "stage": {
+     "api_to_radio": {
+      "n": 20,
+      "avg_us": 5859,
+      "max_us": 5860,
+      "total_ms": 117
+     },
+     "encode": {
+      "n": 20,
+      "avg_us": 4882,
+      "max_us": 4883,
+      "total_ms": 97
+     },
+     "tx_queue": {
+      "n": 20,
+      "avg_us": 33203,
+      "max_us": 36133,
+      "total_ms": 664
+     },
+     "tx_air": {
+      "n": 20,
+      "avg_us": 4101,
+      "max_us": 4883,
+      "total_ms": 82
+     },
+     "isr_latency": {
+      "n": 40,
+      "avg_us": 317,
+      "max_us": 977,
+      "total_ms": 12
+     },
+     "rx_handle": {
+      "n": 20,
+      "avg_us": 976,
+      "max_us": 977,
+      "total_ms": 19
+     },
+     "router_queue": {
+      "n": 20,
+      "avg_us": 976,
+      "max_us": 977,
+      "total_ms": 19
+     },
+     "router_handle": {
+      "n": 20,
+      "avg_us": 976,
+      "max_us": 977,
+      "total_ms": 19
+     },
+     "decode": {
+      "n": 40,
+      "avg_us": 488,
+      "max_us": 977,
+      "total_ms": 19
+     },
+     "modules": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "nodedb_update": {
+      "n": 40,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "phone_queue": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "api_emit": {
+      "n": 40,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "loop_busy": {
+      "n": 41673,
+      "avg_us": 40,
+      "max_us": 8789,
+      "total_ms": 1678
+     },
+     "loop_pre": {
+      "n": 41672,
+      "avg_us": 15,
+      "max_us": 977,
+      "total_ms": 626
+     },
+     "loop_threads": {
+      "n": 41673,
+      "avg_us": 23,
+      "max_us": 8789,
+      "total_ms": 963
+     },
+     "loop_gap": {
+      "n": 41672,
+      "avg_us": 11,
+      "max_us": 977,
+      "total_ms": 499
+     }
+    },
+    "thread": {
+     "SerialConsole": {
+      "n": 441,
+      "avg_us": 429,
+      "max_us": 7813,
+      "total_ms": 189
+     },
+     "Router": {
+      "n": 40,
+      "avg_us": 488,
+      "max_us": 977,
+      "total_ms": 19
+     },
+     "UserButton": {
+      "n": 23,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "PowerFSM": {
+      "n": 23,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "RadioIf": {
+      "n": 60,
+      "avg_us": 1416,
+      "max_us": 1954,
+      "total_ms": 84
+     },
+     "GPS": {
+      "n": 11,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "Position": {
+      "n": 1,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "StatusLEDModule": {
+      "n": 2,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "AirTime": {
+      "n": 2,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     }
+    },
+    "log_lines": 0
+   },
+   "B": {
+    "window_ms": 2208,
+    "stage": {
+     "encode": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "tx_queue": {
+      "n": 20,
+      "avg_us": 33593,
+      "max_us": 37110,
+      "total_ms": 671
+     },
+     "tx_air": {
+      "n": 20,
+      "avg_us": 976,
+      "max_us": 977,
+      "total_ms": 19
+     },
+     "isr_latency": {
+      "n": 40,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "rx_handle": {
+      "n": 20,
+      "avg_us": 2832,
+      "max_us": 2930,
+      "total_ms": 56
+     },
+     "router_queue": {
+      "n": 20,
+      "avg_us": 976,
+      "max_us": 977,
+      "total_ms": 19
+     },
+     "router_handle": {
+      "n": 20,
+      "avg_us": 5078,
+      "max_us": 5860,
+      "total_ms": 101
+     },
+     "decode": {
+      "n": 40,
+      "avg_us": 2441,
+      "max_us": 4883,
+      "total_ms": 97
+     },
+     "modules": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "nodedb_update": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "phone_queue": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "api_emit": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "loop_busy": {
+      "n": 42359,
+      "avg_us": 37,
+      "max_us": 5860,
+      "total_ms": 1602
+     },
+     "loop_pre": {
+      "n": 42359,
+      "avg_us": 15,
+      "max_us": 977,
+      "total_ms": 643
+     },
+     "loop_threads": {
+      "n": 42359,
+      "avg_us": 20,
+      "max_us": 5860,
+      "total_ms": 878
+     },
+     "loop_gap": {
+      "n": 42359,
+      "avg_us": 10,
+      "max_us": 977,
+      "total_ms": 462
+     }
+    },
+    "thread": {
+     "RadioIf": {
+      "n": 60,
+      "avg_us": 1725,
+      "max_us": 3907,
+      "total_ms": 103
+     },
+     "Router": {
+      "n": 20,
+      "avg_us": 5127,
+      "max_us": 5860,
+      "total_ms": 102
+     },
+     "SerialConsole": {
+      "n": 21,
+      "avg_us": 929,
+      "max_us": 977,
+      "total_ms": 19
+     },
+     "UserButton": {
+      "n": 22,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "PowerFSM": {
+      "n": 22,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "GPS": {
+      "n": 11,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "StatusLEDModule": {
+      "n": 2,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "AirTime": {
+      "n": 2,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     }
+    },
+    "log_lines": 0
+   }
+  }
+ },
+ "FLRC_FAST": {
+  "stream": {
+   "outcome": {
+    "sent": 20,
+    "received": 0,
+    "send_s": 1.5058691501617432,
+    "total_s": 6.510555267333984,
+    "kbps": 0
+   },
+   "A": {
+    "window_ms": 4678,
+    "stage": {
+     "api_to_radio": {
+      "n": 20,
+      "avg_us": 1416,
+      "max_us": 1954,
+      "total_ms": 28
+     },
+     "encode": {
+      "n": 20,
+      "avg_us": 830,
+      "max_us": 977,
+      "total_ms": 16
+     },
+     "tx_queue": {
+      "n": 20,
+      "avg_us": 319677,
+      "max_us": 701172,
+      "total_ms": 6393
+     },
+     "tx_air": {
+      "n": 40,
+      "avg_us": 2929,
+      "max_us": 2930,
+      "total_ms": 117
+     },
+     "isr_latency": {
+      "n": 42,
+      "avg_us": 25413,
+      "max_us": 986329,
+      "total_ms": 1067
+     },
+     "rx_handle": {
+      "n": 2,
+      "avg_us": 976,
+      "max_us": 976,
+      "total_ms": 1
+     },
+     "decode": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "modules": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "nodedb_update": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "api_emit": {
+      "n": 5,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "loop_busy": {
+      "n": 27872,
+      "avg_us": 94,
+      "max_us": 1049805,
+      "total_ms": 2640
+     },
+     "loop_pre": {
+      "n": 27872,
+      "avg_us": 15,
+      "max_us": 977,
+      "total_ms": 427
+     },
+     "loop_threads": {
+      "n": 27873,
+      "avg_us": 76,
+      "max_us": 1049805,
+      "total_ms": 2137
+     },
+     "loop_gap": {
+      "n": 27872,
+      "avg_us": 11,
+      "max_us": 977,
+      "total_ms": 306
+     }
+    },
+    "thread": {
+     "SerialConsole": {
+      "n": 277,
+      "avg_us": 296,
+      "max_us": 59570,
+      "total_ms": 82
+     },
+     "StatusLEDModule": {
+      "n": 3,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "UserButton": {
+      "n": 16,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "AirTime": {
+      "n": 3,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "PowerFSM": {
+      "n": 16,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "RadioIf": {
+      "n": 82,
+      "avg_us": 833,
+      "max_us": 1954,
+      "total_ms": 68
+     },
+     "Position": {
+      "n": 1,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     }
+    },
+    "log_lines": 0
+   },
+   "B": {
+    "window_ms": 10916,
+    "stage": {
+     "encode": {
+      "n": 2,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "tx_queue": {
+      "n": 2,
+      "avg_us": 12695,
+      "max_us": 13672,
+      "total_ms": 25
+     },
+     "tx_air": {
+      "n": 2,
+      "avg_us": 976,
+      "max_us": 977,
+      "total_ms": 1
+     },
+     "isr_latency": {
+      "n": 14,
+      "avg_us": 280133,
+      "max_us": 989258,
+      "total_ms": 3921
+     },
+     "rx_handle": {
+      "n": 12,
+      "avg_us": 1139,
+      "max_us": 1954,
+      "total_ms": 13
+     },
+     "router_queue": {
+      "n": 2,
+      "avg_us": 976,
+      "max_us": 977,
+      "total_ms": 1
+     },
+     "router_handle": {
+      "n": 2,
+      "avg_us": 39062,
+      "max_us": 73242,
+      "total_ms": 78
+     },
+     "decode": {
+      "n": 4,
+      "avg_us": 19531,
+      "max_us": 73242,
+      "total_ms": 78
+     },
+     "modules": {
+      "n": 2,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "nodedb_update": {
+      "n": 2,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "phone_queue": {
+      "n": 2,
+      "avg_us": 488,
+      "max_us": 977,
+      "total_ms": 0
+     },
+     "api_emit": {
+      "n": 2,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "loop_busy": {
+      "n": 24244,
+      "avg_us": 283,
+      "max_us": 1099610,
+      "total_ms": 6874
+     },
+     "loop_pre": {
+      "n": 24243,
+      "avg_us": 15,
+      "max_us": 977,
+      "total_ms": 368
+     },
+     "loop_threads": {
+      "n": 24244,
+      "avg_us": 266,
+      "max_us": 1099610,
+      "total_ms": 6457
+     },
+     "loop_gap": {
+      "n": 24244,
+      "avg_us": 10,
+      "max_us": 977,
+      "total_ms": 264
+     }
+    },
+    "thread": {
+     "RadioIf": {
+      "n": 16,
+      "avg_us": 1770,
+      "max_us": 2930,
+      "total_ms": 28
+     },
+     "SerialConsole": {
+      "n": 12,
+      "avg_us": 244,
+      "max_us": 1953,
+      "total_ms": 2
+     },
+     "Power": {
+      "n": 1,
+      "avg_us": 976,
+      "max_us": 976,
+      "total_ms": 0
+     },
+     "StatusLEDModule": {
+      "n": 5,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "UserButton": {
+      "n": 16,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "AirTime": {
+      "n": 5,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "PowerFSM": {
+      "n": 16,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "Router": {
+      "n": 2,
+      "avg_us": 39062,
+      "max_us": 73242,
+      "total_ms": 78
+     }
+    },
+    "log_lines": 0
+   }
+  },
+  "ack": {
+   "outcome": {
+    "acked": 20,
+    "lat_median_ms": 89.48707580566406
+   },
+   "A": {
+    "window_ms": 3333,
+    "stage": {
+     "api_to_radio": {
+      "n": 20,
+      "avg_us": 5859,
+      "max_us": 5860,
+      "total_ms": 117
+     },
+     "encode": {
+      "n": 20,
+      "avg_us": 4882,
+      "max_us": 4883,
+      "total_ms": 97
+     },
+     "tx_queue": {
+      "n": 20,
+      "avg_us": 14013,
+      "max_us": 17578,
+      "total_ms": 280
+     },
+     "tx_air": {
+      "n": 40,
+      "avg_us": 2929,
+      "max_us": 2930,
+      "total_ms": 117
+     },
+     "isr_latency": {
+      "n": 60,
+      "avg_us": 227,
+      "max_us": 977,
+      "total_ms": 13
+     },
+     "rx_handle": {
+      "n": 20,
+      "avg_us": 1172,
+      "max_us": 1953,
+      "total_ms": 23
+     },
+     "router_queue": {
+      "n": 20,
+      "avg_us": 976,
+      "max_us": 977,
+      "total_ms": 19
+     },
+     "router_handle": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "decode": {
+      "n": 42,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "modules": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "nodedb_update": {
+      "n": 40,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "phone_queue": {
+      "n": 22,
+      "avg_us": 976,
+      "max_us": 977,
+      "total_ms": 21
+     },
+     "api_emit": {
+      "n": 42,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "loop_busy": {
+      "n": 43999,
+      "avg_us": 39,
+      "max_us": 8789,
+      "total_ms": 1756
+     },
+     "loop_pre": {
+      "n": 43997,
+      "avg_us": 15,
+      "max_us": 977,
+      "total_ms": 666
+     },
+     "loop_threads": {
+      "n": 43999,
+      "avg_us": 22,
+      "max_us": 8789,
+      "total_ms": 992
+     },
+     "loop_gap": {
+      "n": 43999,
+      "avg_us": 11,
+      "max_us": 977,
+      "total_ms": 514
+     }
+    },
+    "thread": {
+     "DeviceTelemetry": {
+      "n": 1,
+      "avg_us": 977,
+      "max_us": 977,
+      "total_ms": 0
+     },
+     "SerialConsole": {
+      "n": 413,
+      "avg_us": 437,
+      "max_us": 7813,
+      "total_ms": 180
+     },
+     "GPS": {
+      "n": 13,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "UserButton": {
+      "n": 24,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "PowerFSM": {
+      "n": 24,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "StatusLEDModule": {
+      "n": 4,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "AirTime": {
+      "n": 4,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "Router": {
+      "n": 40,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "RadioIf": {
+      "n": 100,
+      "avg_us": 1181,
+      "max_us": 2930,
+      "total_ms": 118
+     }
+    },
+    "log_lines": 0
+   },
+   "B": {
+    "window_ms": 3431,
+    "stage": {
+     "encode": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "tx_queue": {
+      "n": 20,
+      "avg_us": 13915,
+      "max_us": 29297,
+      "total_ms": 278
+     },
+     "tx_air": {
+      "n": 20,
+      "avg_us": 976,
+      "max_us": 977,
+      "total_ms": 19
+     },
+     "isr_latency": {
+      "n": 63,
+      "avg_us": 31,
+      "max_us": 977,
+      "total_ms": 1
+     },
+     "rx_handle": {
+      "n": 43,
+      "avg_us": 1907,
+      "max_us": 1954,
+      "total_ms": 82
+     },
+     "router_queue": {
+      "n": 20,
+      "avg_us": 976,
+      "max_us": 977,
+      "total_ms": 19
+     },
+     "router_handle": {
+      "n": 20,
+      "avg_us": 4882,
+      "max_us": 4883,
+      "total_ms": 97
+     },
+     "decode": {
+      "n": 42,
+      "avg_us": 2325,
+      "max_us": 4883,
+      "total_ms": 97
+     },
+     "modules": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "nodedb_update": {
+      "n": 20,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "phone_queue": {
+      "n": 22,
+      "avg_us": 1020,
+      "max_us": 1953,
+      "total_ms": 22
+     },
+     "api_emit": {
+      "n": 22,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "loop_busy": {
+      "n": 49274,
+      "avg_us": 38,
+      "max_us": 6835,
+      "total_ms": 1877
+     },
+     "loop_pre": {
+      "n": 49272,
+      "avg_us": 14,
+      "max_us": 977,
+      "total_ms": 725
+     },
+     "loop_threads": {
+      "n": 49274,
+      "avg_us": 21,
+      "max_us": 6835,
+      "total_ms": 1065
+     },
+     "loop_gap": {
+      "n": 49272,
+      "avg_us": 10,
+      "max_us": 977,
+      "total_ms": 538
+     }
+    },
+    "thread": {
+     "RadioIf": {
+      "n": 84,
+      "avg_us": 1953,
+      "max_us": 2930,
+      "total_ms": 164
+     },
+     "UserButton": {
+      "n": 26,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "PowerFSM": {
+      "n": 26,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "GPS": {
+      "n": 13,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "SerialConsole": {
+      "n": 24,
+      "avg_us": 1261,
+      "max_us": 1954,
+      "total_ms": 30
+     },
+     "Router": {
+      "n": 20,
+      "avg_us": 4882,
+      "max_us": 4883,
+      "total_ms": 97
+     },
+     "DeviceTelemetry": {
+      "n": 1,
+      "avg_us": 977,
+      "max_us": 977,
+      "total_ms": 0
+     },
+     "StatusLEDModule": {
+      "n": 2,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "AirTime": {
+      "n": 2,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "Position": {
+      "n": 1,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     },
+     "Power": {
+      "n": 1,
+      "avg_us": 0,
+      "max_us": 0,
+      "total_ms": 0
+     }
+    },
+    "log_lines": 0
+   }
+  }
+ }
+}

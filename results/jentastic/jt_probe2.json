@@ -1,0 +1,83 @@
+{
+ "FSK 500 125 467 32 / 200B": {
+  "mode": "FSK 500 125 467 32",
+  "size": 200,
+  "ack": {
+   "n": 6,
+   "acked": 0,
+   "lat_median_ms": null
+  },
+  "stream": {
+   "sent": 6,
+   "received": 0,
+   "send_s": 0.0003924369812011719,
+   "total_s": 6.005992889404297,
+   "kbps": 0
+  },
+  "status": {
+   "A": [
+    "🔴 JT: FSK accepted. BR:500.0k DEV:125.0k BW:467.0k PRE:32. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FSK BR:500.0k dev:125.0k bw:467.0k pre:32 | caps:FSK FLRC "
+   ],
+   "B": [
+    "🔴 JT: FSK accepted. BR:500.0k DEV:125.0k BW:467.0k PRE:32. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FSK BR:500.0k dev:125.0k bw:467.0k pre:32 | caps:FSK FLRC "
+   ]
+  },
+  "rssi_median": null
+ },
+ "FSK 1000 250 467 32 / 200B": {
+  "mode": "FSK 1000 250 467 32",
+  "size": 200,
+  "ack": {
+   "n": 6,
+   "acked": 0,
+   "lat_median_ms": null
+  },
+  "stream": {
+   "sent": 6,
+   "received": 0,
+   "send_s": 0.000698089599609375,
+   "total_s": 6.006690979003906,
+   "kbps": 0
+  },
+  "status": {
+   "A": [
+    "🔴 JT: FSK accepted. BR:1000.0k DEV:250.0k BW:467.0k PRE:32. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FSK BR:1000.0k dev:250.0k bw:467.0k pre:32 | caps:FSK FLRC "
+   ],
+   "B": [
+    "🔴 JT: FSK accepted. BR:1000.0k DEV:250.0k BW:467.0k PRE:32. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FSK BR:1000.0k dev:250.0k bw:467.0k pre:32 | caps:FSK FLRC "
+   ]
+  },
+  "rssi_median": null
+ },
+ "FSK 2000 500 467 32 / 200B": {
+  "mode": "FSK 2000 500 467 32",
+  "size": 200,
+  "ack": {
+   "n": 6,
+   "acked": 0,
+   "lat_median_ms": null
+  },
+  "stream": {
+   "sent": 6,
+   "received": 0,
+   "send_s": 0.001050710678100586,
+   "total_s": 6.006542921066284,
+   "kbps": 0
+  },
+  "status": {
+   "A": [
+    "🔴 JT: FSK accepted. BR:2000.0k DEV:500.0k BW:467.0k PRE:32. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FSK BR:2000.0k dev:500.0k bw:467.0k pre:32 | caps:FSK FLRC "
+   ],
+   "B": [
+    "🔴 JT: FSK accepted. BR:2000.0k DEV:500.0k BW:467.0k PRE:32. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FSK BR:2000.0k dev:500.0k bw:467.0k pre:32 | caps:FSK FLRC "
+   ]
+  },
+  "rssi_median": null
+ }
+}

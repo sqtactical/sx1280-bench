@@ -1,0 +1,50 @@
+{
+ "modem": "lora",
+ "pl": 255,
+ "pwr": 0,
+ "opt": "1 1 0x80",
+ "win": 1,
+ "results": [
+  {
+   "mode": "SF5 BW1625",
+   "nominal_kbps": 203.125,
+   "pl": 255,
+   "toa_us": 10658,
+   "burst": {
+    "n": 275,
+    "rx": 274,
+    "loss_pct": 0.36363636363636365,
+    "crc": 0,
+    "rssi": -36,
+    "rawbad": 0,
+    "overrun": 0,
+    "pkt_us": 10932.901818181817,
+    "toa_us": 10658,
+    "raw_kbps": 186.59273026740303,
+    "prof": "PROF n=275 load=162 fire=13 air=10741 (toa=10658 startup=83) post=11 us/pkt"
+   },
+   "file": {
+    "size": 203125,
+    "sha_ok": true,
+    "tx_kbps": 159.9,
+    "rx_kbps": 159.95,
+    "host_kbps": 159.88741879157703,
+    "host_s": 10.16340130000026,
+    "pkts": 810,
+    "retx": 0,
+    "polls": 0,
+    "tmos": 0,
+    "crcerr": 0,
+    "overrun": 0,
+    "rssi": -36,
+    "t_start": 2762,
+    "t_data": 8869120,
+    "t_ack": 1282223,
+    "t_usbwait": 1429,
+    "radio_us": 10161131,
+    "blocks": 42,
+    "prof": "PROF n=810 load=162 fire=13 air=10733 (toa=10658 startup=75) post=11 us/pkt"
+   }
+  }
+ ]
+}

@@ -1,0 +1,50 @@
+{
+ "modem": "gfsk",
+ "pl": 255,
+ "pwr": 0,
+ "opt": "1 1 0x80",
+ "win": 8,
+ "results": [
+  {
+   "mode": "2000k BW2400",
+   "nominal_kbps": 2000,
+   "pl": 255,
+   "toa_us": 1056,
+   "burst": {
+    "n": 2297,
+    "rx": 2297,
+    "loss_pct": 0.0,
+    "crc": 0,
+    "rssi": -35,
+    "rawbad": 0,
+    "overrun": 0,
+    "pkt_us": 1325.8898563343491,
+    "toa_us": 1056,
+    "raw_kbps": 1538.5893407767153,
+    "prof": "PROF n=2297 load=163 fire=13 air=1135 (toa=1056 startup=79) post=10 us/pkt"
+   },
+   "file": {
+    "size": 204800,
+    "sha_ok": true,
+    "tx_kbps": 1307.6,
+    "rx_kbps": 1307.64,
+    "host_kbps": 1296.6782196760214,
+    "host_s": 1.263536300015403,
+    "pkts": 816,
+    "retx": 0,
+    "polls": 0,
+    "tmos": 2,
+    "crcerr": 0,
+    "overrun": 0,
+    "rssi": -35,
+    "t_start": 5512,
+    "t_data": 1177766,
+    "t_ack": 68588,
+    "t_usbwait": 179,
+    "radio_us": 1253020,
+    "blocks": 102,
+    "prof": "PROF n=816 load=200 fire=15 air=1146 (toa=1056 startup=90) post=17 us/pkt"
+   }
+  }
+ ]
+}

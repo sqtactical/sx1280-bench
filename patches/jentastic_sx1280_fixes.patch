@@ -1,0 +1,1275 @@
+diff --git a/src/RedirectablePrint.cpp b/src/RedirectablePrint.cpp
+index e4a56bb..d6798b6 100644
+--- a/src/RedirectablePrint.cpp
++++ b/src/RedirectablePrint.cpp
+@@ -5,6 +5,7 @@
+ #include "gps/RTC.h"
+ #include "main.h"
+ #include "memGet.h"
++#include "mesh/PacketProfiler.h"
+ #include "mesh/generated/meshtastic/mesh.pb.h"
+ #include <assert.h>
+ #include <cstring>
+@@ -286,6 +287,7 @@ meshtastic_LogRecord_Level RedirectablePrint::getLogLevel(const char *logLevel)
+ 
+ void RedirectablePrint::log(const char *logLevel, const char *format, ...)
+ {
++    PROF_SCOPE(LOG);
+ 
+     // append \n to format
+     size_t len = strlen(format);
+diff --git a/src/concurrency/OSThread.cpp b/src/concurrency/OSThread.cpp
+index defc040..ed152bd 100644
+--- a/src/concurrency/OSThread.cpp
++++ b/src/concurrency/OSThread.cpp
+@@ -1,6 +1,7 @@
+ #include "OSThread.h"
+ #include "configuration.h"
+ #include "memGet.h"
++#include "mesh/PacketProfiler.h"
+ #include <assert.h>
+ 
+ namespace concurrency
+@@ -83,7 +84,9 @@ void OSThread::run()
+     auto heap = memGet.getFreeHeap();
+ #endif
+     currentThread = this;
++    PROF_DO(uint32_t profStart = micros());
+     auto newDelay = runOnce();
++    PROF_DO(prof::threadRan(this, ThreadName.c_str(), micros() - profStart));
+ #ifdef DEBUG_HEAP
+     auto newHeap = memGet.getFreeHeap();
+     if (newHeap < heap)
+diff --git a/src/main.cpp b/src/main.cpp
+index 2db4bfd..afa0256 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -11,6 +11,7 @@
+ #include "MeshRadio.h"
+ #include "MeshService.h"
+ #include "NodeDB.h"
++#include "PacketProfiler.h"
+ #include "PowerFSM.h"
+ #include "PowerMon.h"
+ #include "RadioLibInterface.h"
+@@ -1396,6 +1397,9 @@ void scannerToSensorsMap(const std::unique_ptr<ScanI2CTwoWire> &i2cScanner, Scan
+ void loop()
+ {
+     runASAP = false;
++    PROF_DO(uint32_t profLoopStart = micros());
++    PROF_DO(static uint32_t profLoopEnd = profLoopStart);
++    PROF_DO(prof::add(prof::LOOP_GAP, profLoopStart - profLoopEnd));
+ 
+     // The single writer of the monotonic wrap carry; every other caller only reads it.
+     Time::serviceMonotonic();
+@@ -1571,7 +1575,13 @@ void loop()
+ #if !MESHTASTIC_EXCLUDE_WAYPOINT && ENABLE_WAYPOINT_PERSISTENCE
+     waypointStoreAutosaveTick();
+ #endif
++    PROF_DO(uint32_t profThreadsStart = micros());
++    PROF_DO(prof::add(prof::LOOP_PRE, profThreadsStart - profLoopStart));
+     long delayMsec = mainController.runOrDelay();
++    PROF_DO(prof::add(prof::LOOP_THREADS, micros() - profThreadsStart));
++    PROF_DO(prof::add(prof::LOOP_BUSY, micros() - profLoopStart));
++    PROF_DO(prof::loopTick());
++    PROF_DO(profLoopEnd = micros());
+ 
+     // We want to sleep as long as possible here - because it saves power
+     if (!runASAP && loopCanSleep()) {
+diff --git a/src/mesh/CryptoEngine.cpp b/src/mesh/CryptoEngine.cpp
+index 292adcd..c161c3c 100644
+--- a/src/mesh/CryptoEngine.cpp
++++ b/src/mesh/CryptoEngine.cpp
+@@ -1,4 +1,5 @@
+ #include "CryptoEngine.h"
++#include "PacketProfiler.h"
+ // #include "NodeDB.h"
+ #include "aes-ccm.h"
+ #include "architecture.h"
+@@ -174,6 +175,7 @@ static size_t buildSigningBuffer(uint8_t *buf, size_t bufSize, uint32_t fromNode
+ bool CryptoEngine::xeddsa_sign(uint32_t fromNode, uint32_t packetId, uint32_t toNode, const meshtastic_Data *d,
+                                uint8_t *signature)
+ {
++    PROF_SCOPE(XEDDSA_SIGN);
+     if (memfll(xeddsa_private_key, 0, sizeof(xeddsa_private_key)))
+         return false;
+     uint8_t sigBuf[XEDDSA_SIGN_BUF_LEN];
+@@ -192,6 +194,7 @@ bool CryptoEngine::xeddsa_sign(uint32_t fromNode, uint32_t packetId, uint32_t to
+ bool CryptoEngine::xeddsa_verify(const uint8_t *pubKey, uint32_t fromNode, uint32_t packetId, uint32_t toNode,
+                                  const meshtastic_Data *d, const uint8_t *signature)
+ {
++    PROF_SCOPE(XEDDSA_VERIFY);
+     // Use cached Ed25519 key if the Curve25519 key matches, avoiding expensive field inversion
+     if (memcmp(pubKey, cached_curve_pubkey, 32) != 0) {
+         curve_to_ed_pub(pubKey, cached_ed_pubkey);
+@@ -360,6 +363,7 @@ static const char ACK_PROOF_LABEL[] = "ack";
+ bool CryptoEngine::ackProofCompute(const uint8_t *peerPubKey, uint32_t ackFrom, uint32_t ackTo, uint32_t requestId,
+                                    const uint8_t *routing, size_t routingLen, uint8_t *proofOut)
+ {
++    PROF_SCOPE(ACK_PROOF);
+     if (memfll(private_key, 0, sizeof(private_key)))
+         return false; // no identity yet - nothing to prove with
+ 
+@@ -443,7 +447,19 @@ void CryptoEngine::aesEncrypt(uint8_t *in, uint8_t *out)
+ 
+ bool CryptoEngine::setDHPublicKey(uint8_t *pubKey)
+ {
++    PROF_SCOPE(DH_SHARED);
++    // X25519 takes ~70 ms on an nRF52 and every DM / ack proof needs one, so keep the last few results. Entries are
++    // keyed on our private key too, so a key change can never serve a stale secret. Callers hold cryptLock.
++    for (auto &e : dhCache) {
++        if (e.used && memcmp(e.peer, pubKey, 32) == 0 && memcmp(e.priv, private_key, 32) == 0) {
++            memcpy(shared_key, e.secret, 32);
++            return true;
++        }
++    }
++
+     uint8_t local_priv[32];
++    uint8_t peer[32];
++    memcpy(peer, pubKey, 32);
+     memcpy(shared_key, pubKey, 32);
+     memcpy(local_priv, private_key, 32);
+     // Calculate the shared secret with the specified node's public key and our private key
+@@ -452,6 +468,13 @@ bool CryptoEngine::setDHPublicKey(uint8_t *pubKey)
+         LOG_WARN("Curve25519DH step 2 failed");
+         return false;
+     }
++
++    DhCacheEntry &e = dhCache[dhCacheNext];
++    dhCacheNext = (dhCacheNext + 1) % DH_CACHE_SIZE;
++    memcpy(e.peer, peer, 32);
++    memcpy(e.priv, private_key, 32);
++    memcpy(e.secret, shared_key, 32);
++    e.used = true;
+     return true;
+ }
+ 
+diff --git a/src/mesh/CryptoEngine.h b/src/mesh/CryptoEngine.h
+index 82f9809..fdc8bb0 100644
+--- a/src/mesh/CryptoEngine.h
++++ b/src/mesh/CryptoEngine.h
+@@ -108,6 +108,17 @@ class CryptoEngine
+                                    size_t numBytes, const uint8_t *bytes, uint8_t *bytesOut);
+     virtual bool setDHPublicKey(uint8_t *publicKey);
+ 
++  private:
++    struct DhCacheEntry {
++        uint8_t peer[32], priv[32], secret[32];
++        bool used;
++    };
++    static constexpr uint8_t DH_CACHE_SIZE = 4;
++    DhCacheEntry dhCache[DH_CACHE_SIZE] = {};
++    uint8_t dhCacheNext = 0;
++
++  public:
++
+     // Temporary holder for a peer's not-yet-verified public key, learned in-band during an
+     // in-progress key-verification handshake before it is committed to NodeDB. Lets the Router
+     // run the DH handshake to encode/decode the follow-on PKI packet. Single slot is enough:
+diff --git a/src/mesh/HardwareRNG.cpp b/src/mesh/HardwareRNG.cpp
+index 451b8d8..e17d0fa 100644
+--- a/src/mesh/HardwareRNG.cpp
++++ b/src/mesh/HardwareRNG.cpp
+@@ -15,6 +15,7 @@
+ #elif defined(ARCH_NRF52)
+ #include <Adafruit_nRFCrypto.h>
+ extern Adafruit_nRFCrypto nRFCrypto;
++void nrf52CryptoCellAcquire(); // NRF52CryptoEngine.cpp: keeps CryptoCell up between uses, powers it down when idle
+ #elif defined(ARCH_ESP32)
+ #include <esp_system.h>
+ #elif defined(ARCH_RP2040)
+@@ -116,9 +117,8 @@ bool fill(uint8_t *buffer, size_t length, bool useRadioEntropy)
+     nRF54Crypto.end();
+ #elif defined(ARCH_NRF52)
+     // The Nordic SDK RNG provides cryptographic-quality randomness backed by hardware.
+-    nRFCrypto.begin();
++    nrf52CryptoCellAcquire();
+     auto result = nRFCrypto.Random.generate(buffer, length);
+-    nRFCrypto.end();
+     filled = result;
+ #elif defined(ARCH_ESP32)
+     // ESP32 exposes a true RNG via esp_fill_random().
+diff --git a/src/mesh/MeshModule.cpp b/src/mesh/MeshModule.cpp
+index 621d2bf..8f31d2f 100644
+--- a/src/mesh/MeshModule.cpp
++++ b/src/mesh/MeshModule.cpp
+@@ -3,6 +3,7 @@
+ #include "Channels.h"
+ #include "MeshService.h"
+ #include "NodeDB.h"
++#include "PacketProfiler.h"
+ #include "configuration.h"
+ #include "modules/RoutingModule.h"
+ #include <algorithm>
+@@ -115,6 +116,7 @@ meshtastic_MeshPacket *MeshModule::allocErrorResponse(meshtastic_Routing_Error e
+ 
+ void MeshModule::callModules(meshtastic_MeshPacket &mp, RxSource src)
+ {
++    PROF_SCOPE(MODULES);
+     // LOG_DEBUG("In call modules");
+     bool moduleFound = false;
+ 
+@@ -171,9 +173,11 @@ void MeshModule::callModules(meshtastic_MeshPacket &mp, RxSource src)
+                 } else
+                     printPacket("packet on wrong channel, but can't respond", &mp);
+             } else {
++                PROF_DO(uint32_t profModStart = micros());
+                 ProcessMessage handled = pi.handleReceived(mp);
+ 
+                 pi.alterReceived(mp);
++                PROF_DO(prof::threadRan(&pi, pi.name, micros() - profModStart)); // listed as "thread=<module name>"
+ 
+                 // Possibly send replies (but only if the message was directed to us specifically, i.e. not for promiscious
+                 // sniffing) also: we only let the one module send a reply, once that happens, remaining modules are not
+diff --git a/src/mesh/MeshService.cpp b/src/mesh/MeshService.cpp
+index a9ad80c..958bc69 100644
+--- a/src/mesh/MeshService.cpp
++++ b/src/mesh/MeshService.cpp
+@@ -9,6 +9,7 @@
+ #include "MeshService.h"
+ #include "MessageStore.h"
+ #include "NodeDB.h"
++#include "PacketProfiler.h"
+ #include "Power.h"
+ #include "PowerFSM.h"
+ #include "TypeConversions.h"
+@@ -650,6 +651,7 @@ void MeshService::sendToPhone(meshtastic_MeshPacket *p)
+         fromNum++; // notify observers so phone can resync
+         return;
+     }
++    PROF_DO(prof::mark(p->id, prof::SLOT_PQ));
+     fromNum++;
+ }
+ 
+diff --git a/src/mesh/NodeDB.cpp b/src/mesh/NodeDB.cpp
+index bdfc849..448dee8 100644
+--- a/src/mesh/NodeDB.cpp
++++ b/src/mesh/NodeDB.cpp
+@@ -12,6 +12,7 @@
+ #include "MessageStore.h"
+ #include "NodeDB.h"
+ #include "PacketHistory.h"
++#include "PacketProfiler.h"
+ #include "PowerFSM.h"
+ #include "RadioInterface.h"
+ #include "Router.h"
+@@ -3948,6 +3949,7 @@ bool NodeDB::updateUser(uint32_t nodeId, meshtastic_User &p, uint8_t channelInde
+ /// we updateGUI and updateGUIforNode if we think our this change is big enough for a redraw
+ void NodeDB::updateFrom(const meshtastic_MeshPacket &mp)
+ {
++    PROF_SCOPE(NODEDB_UPDATE);
+     if (mp.from == getNodeNum()) {
+         LOG_DEBUG("Ignore update from self");
+         return;
+diff --git a/src/mesh/PacketProfiler.cpp b/src/mesh/PacketProfiler.cpp
+new file mode 100644
+index 0000000..ac4476d
+--- /dev/null
++++ b/src/mesh/PacketProfiler.cpp
+@@ -0,0 +1,129 @@
++#include "PacketProfiler.h"
++
++#ifdef PROFILE_PACKETS
++namespace prof
++{
++static const char *const stageNames[NUM_STAGES] = {"api_to_radio", "encode",        "tx_queue", "tx_air",        "isr_latency",
++                                                   "rx_handle",    "router_queue",  "router_handle", "decode",   "modules",
++                                                   "nodedb_update", "phone_queue",  "api_emit", "log",           "loop_busy",
++                                                   "loop_pre",      "loop_threads", "loop_gap",     "xeddsa_sign",   "xeddsa_verify",
++                                                   "ack_proof",     "dh_shared"};
++
++struct Stat {
++    uint32_t n, sum, max;
++};
++
++struct ThreadStat {
++    const void *thread;
++    const char *name;
++    Stat st;
++};
++
++struct Pending {
++    uint32_t id;
++    uint32_t t;
++    uint8_t slot;
++    bool used;
++};
++
++static const uint8_t THREAD_SLOTS = 40, PENDING_SLOTS = 24;
++static const uint32_t TAIL_MSEC = 300, IDLE_DUMP_MSEC = 3000;
++
++static Stat stats[NUM_STAGES];
++static ThreadStat threads[THREAD_SLOTS];
++static Pending pending[PENDING_SLOTS];
++static uint32_t windowStart, lastActivity;
++volatile uint32_t isrAt;
++uint32_t txStartAt;
++
++// Background costs (logs, threads, loop) only count while packets are flowing
++static bool inWindow()
++{
++    return windowStart && millis() - lastActivity < TAIL_MSEC;
++}
++
++static void record(Stat &st, uint32_t us)
++{
++    st.n++;
++    st.sum += us;
++    if (us > st.max)
++        st.max = us;
++}
++
++void add(Stage s, uint32_t us)
++{
++    if (s == LOG || (s >= LOOP_BUSY && s <= LOOP_GAP)) {
++        if (!inWindow())
++            return;
++    } else {
++        lastActivity = millis();
++        if (!windowStart)
++            windowStart = lastActivity;
++    }
++    record(stats[s], us);
++}
++
++void mark(uint32_t id, Slot slot)
++{
++    Pending *free = nullptr, *oldest = &pending[0];
++    for (auto &p : pending) {
++        if (!p.used && !free)
++            free = &p;
++        if (p.used && (int32_t)(p.t - oldest->t) < 0)
++            oldest = &p;
++    }
++    Pending *e = free ? free : oldest;
++    *e = {id, micros(), slot, true};
++}
++
++void markEnd(uint32_t id, Slot slot, Stage s)
++{
++    for (auto &p : pending)
++        if (p.used && p.id == id && p.slot == slot) {
++            p.used = false;
++            add(s, micros() - p.t);
++            return;
++        }
++}
++
++void threadRan(const void *thread, const char *name, uint32_t us)
++{
++    // a run that outlasts the tail (a stall) must still count, so only require an open window
++    if (!windowStart)
++        return;
++    for (auto &t : threads) {
++        if (t.thread == thread || !t.thread) {
++            t.thread = thread;
++            t.name = name;
++            record(t.st, us);
++            return;
++        }
++    }
++}
++
++static void printStat(const char *kind, const char *name, const Stat &st)
++{
++    Serial.printf("PROF %s=%s n=%lu avg_us=%lu max_us=%lu total_ms=%lu\r\n", kind, name, (unsigned long)st.n,
++                  (unsigned long)(st.sum / st.n), (unsigned long)st.max, (unsigned long)(st.sum / 1000));
++}
++
++void loopTick()
++{
++    if (!windowStart || millis() - lastActivity < IDLE_DUMP_MSEC)
++        return;
++    Serial.printf("PROF begin window_ms=%lu\r\n", (unsigned long)(lastActivity - windowStart + TAIL_MSEC));
++    for (uint8_t i = 0; i < NUM_STAGES; i++)
++        if (stats[i].n)
++            printStat("stage", stageNames[i], stats[i]);
++    for (auto &t : threads)
++        if (t.thread && t.st.n)
++            printStat("thread", t.name, t.st);
++    Serial.printf("PROF end\r\n");
++    Serial.flush();
++    memset(stats, 0, sizeof(stats));
++    memset(threads, 0, sizeof(threads));
++    memset(pending, 0, sizeof(pending));
++    windowStart = 0;
++}
++} // namespace prof
++#endif
+diff --git a/src/mesh/PacketProfiler.h b/src/mesh/PacketProfiler.h
+new file mode 100644
+index 0000000..a71945a
+--- /dev/null
++++ b/src/mesh/PacketProfiler.h
+@@ -0,0 +1,59 @@
++#pragma once
++
++#include <Arduino.h>
++
++// Per-packet path profiler, compiled in with -DPROFILE_PACKETS. Stats are printed to the USB serial as plain
++// "PROF ..." lines once packet activity has been idle for a few seconds, then reset.
++#ifdef PROFILE_PACKETS
++namespace prof
++{
++enum Stage : uint8_t {
++    API_TO_RADIO,
++    ENCODE,
++    TX_QUEUE,
++    TX_AIR,
++    ISR_LATENCY,
++    RX_HANDLE,
++    ROUTER_QUEUE,
++    ROUTER_HANDLE,
++    DECODE,
++    MODULES,
++    NODEDB_UPDATE,
++    PHONE_QUEUE,
++    API_EMIT,
++    LOG,
++    LOOP_BUSY,
++    LOOP_PRE,
++    LOOP_THREADS,
++    LOOP_GAP,
++    XEDDSA_SIGN,
++    XEDDSA_VERIFY,
++    ACK_PROOF,
++    DH_SHARED,
++    NUM_STAGES
++};
++
++enum Slot : uint8_t { SLOT_TXQ, SLOT_RQ, SLOT_PQ };
++
++void add(Stage s, uint32_t us);
++void mark(uint32_t id, Slot slot);
++void markEnd(uint32_t id, Slot slot, Stage s);
++void threadRan(const void *thread, const char *name, uint32_t us);
++void loopTick();
++
++extern volatile uint32_t isrAt;
++extern uint32_t txStartAt;
++
++struct Scope {
++    Stage s;
++    uint32_t t0;
++    explicit Scope(Stage s) : s(s), t0(micros()) {}
++    ~Scope() { add(s, micros() - t0); }
++};
++} // namespace prof
++#define PROF_SCOPE(s) prof::Scope _profScope(prof::s)
++#define PROF_DO(x) x
++#else
++#define PROF_SCOPE(s)
++#define PROF_DO(x)
++#endif
+diff --git a/src/mesh/PhoneAPI.cpp b/src/mesh/PhoneAPI.cpp
+index f97a89a..ea0a75d 100644
+--- a/src/mesh/PhoneAPI.cpp
++++ b/src/mesh/PhoneAPI.cpp
+@@ -15,6 +15,7 @@
+ #include "MeshRadio.h"
+ #include "MeshService.h"
+ #include "NodeDB.h"
++#include "PacketProfiler.h"
+ #include "PacketHistory.h"
+ #include "PhoneAPI.h"
+ #include "PowerFSM.h"
+@@ -436,6 +437,7 @@ bool PhoneAPI::checkConnectionTimeout()
+  */
+ bool PhoneAPI::handleToRadio(const uint8_t *buf, size_t bufLength)
+ {
++    PROF_SCOPE(API_TO_RADIO);
+     powerFSM.trigger(EVENT_CONTACT_FROM_PHONE); // As long as the phone keeps talking to us, don't let the radio go to sleep
+     lastContactMsec = Time::skipZero(Time::getMillis());
+ 
+@@ -1078,6 +1080,7 @@ size_t PhoneAPI::getFromRadio(uint8_t *buf)
+ #endif
+             {
+                 printPacket("phone downloaded packet", packetForPhone);
++            PROF_DO(prof::markEnd(packetForPhone->id, prof::SLOT_PQ, prof::PHONE_QUEUE));
+                 // Encapsulate as a FromRadio packet
+                 fromRadioScratch.which_payload_variant = meshtastic_FromRadio_packet_tag;
+                 fromRadioScratch.packet = *packetForPhone;
+diff --git a/src/mesh/RNodeEngine.cpp b/src/mesh/RNodeEngine.cpp
+index add1f62..2b0ce14 100644
+--- a/src/mesh/RNodeEngine.cpp
++++ b/src/mesh/RNodeEngine.cpp
+@@ -322,7 +322,9 @@ bool RNodeEngine::looksLikeReticulumPacket(const uint8_t *raw, size_t len)
+ 
+ void RNodeEngine::sendKissFrame(uint8_t cmd, const uint8_t *payload, size_t len, RNodeClientType targetClient)
+ {
+-    uint8_t out[MAX_KISS_FRAME_LEN * 2];
++    // TEST BENCH: static, not on the stack - this runs inside the 3 KB Bluefruit callback task on nRF52 and the 1 KB
++    // frame overflowed it (node rebooted on every BLE write). Not reentrant: TX from BLE and RX from the main loop can race.
++    static uint8_t out[MAX_KISS_FRAME_LEN * 2];
+     size_t idx = 0;
+ 
+     out[idx++] = RNODE_FEND;
+diff --git a/src/mesh/RadioInterface.cpp b/src/mesh/RadioInterface.cpp
+index 930269d..845e4db 100644
+--- a/src/mesh/RadioInterface.cpp
++++ b/src/mesh/RadioInterface.cpp
+@@ -825,6 +825,11 @@ uint32_t RadioInterface::getPacketTime(const meshtastic_MeshPacket *p, bool rece
+     return getPacketTime(pl, received);
+ }
+ 
++bool RadioInterface::altModemActive()
++{
++    return meshtastic::nexusModule && meshtastic::nexusModule->altModem.mode != 0;
++}
++
+ /** The delay to use for retransmitting dropped packets */
+ uint32_t RadioInterface::getRetransmissionMsec(const meshtastic_MeshPacket *p)
+ {
+@@ -838,7 +843,7 @@ uint32_t RadioInterface::getRetransmissionMsec(const meshtastic_MeshPacket *p)
+     uint8_t CWsize = map(channelUtil, 0, 100, CWmin, CWmax);
+     // Assuming we pick max. of CWsize and there will be a client with SNR at half the range
+     return 2 * packetAirtime + (pow_of_2(CWsize) + 2 * CWmax + pow_of_2(int((CWmax + CWmin) / 2))) * slotTimeMsec +
+-           PROCESSING_TIME_MSEC;
++           (altModemActive() ? ALT_MODEM_PROCESSING_TIME_MSEC : PROCESSING_TIME_MSEC);
+ }
+ 
+ /** The delay to use when we want to send something */
+@@ -850,7 +855,7 @@ uint32_t RadioInterface::getTxDelayMsec()
+     float channelUtil = airTime->channelUtilizationPercent();
+     uint8_t CWsize = map(channelUtil, 0, 100, CWmin, CWmax);
+     // LOG_DEBUG("Current channel utilization is %f so setting CWsize to %d", channelUtil, CWsize);
+-    return random(0, pow_of_2(CWsize)) * slotTimeMsec;
++    return random(0, pow_of_2(CWsize)) * slotTimeMsec + (altModemActive() ? ALT_MODEM_MIN_TX_GAP_MSEC : 0);
+ }
+ 
+ /** The CW size to use when calculating SNR_based delays */
+@@ -1465,7 +1470,8 @@ void RadioInterface::applyModemConfig()
+     }
+ 
+     slotTimeMsec = computeSlotTimeMsec();
+-    preambleTimeMsec = preambleLength * (pow_of_2(sf) / bw);
++    // FSK/FLRC preambles are a few dozen bits: well under a millisecond
++    preambleTimeMsec = altModemActive() ? 1 : preambleLength * (pow_of_2(sf) / bw);
+ 
+     LOG_INFO("Radio freq=%.3f, config.lora.frequency_offset=%.3f", freq, loraConfig.frequency_offset);
+     LOG_INFO("Set radio: region=%s, name=%s, config=%u, ch=%d, power=%d", newRegion->name, channelName, loraConfig.modem_preset,
+@@ -1490,6 +1496,11 @@ void RadioInterface::applyModemConfig()
+   - MAC processing time (measured on T-beam) */
+ uint32_t RadioInterface::computeSlotTimeMsec()
+ {
++    // No CAD outside LoRa: carrier sense is an instantaneous RSSI/sync-word check, so a slot only has to cover
++    // turnaround; the LoRa formula would give ~10 ms slots for packets that take 1-10 ms on air
++    if (altModemActive())
++        return ALT_MODEM_SLOT_TIME_MSEC;
++
+     float sumPropagationTurnaroundMACTime = 0.2 + 0.4 + 7; // in milliseconds
+     float symbolTime = pow_of_2(sf) / bw;                  // in milliseconds
+ 
+diff --git a/src/mesh/RadioInterface.h b/src/mesh/RadioInterface.h
+index 42569ea..e5b80f4 100644
+--- a/src/mesh/RadioInterface.h
++++ b/src/mesh/RadioInterface.h
+@@ -113,6 +113,13 @@ class RadioInterface
+     static constexpr uint8_t CWmin = 3; // minimum CWsize
+     static constexpr uint8_t CWmax = 8; // maximum CWsize
+ 
++    // SETFSK/SETFLRC timing: packets take 1-10 ms on air, so the LoRa-sized slots and processing allowance dominate
++    static constexpr uint32_t ALT_MODEM_SLOT_TIME_MSEC = 1;
++    static constexpr uint32_t ALT_MODEM_PROCESSING_TIME_MSEC = 1000;
++    // a receiver must read each frame before the next overwrites the chip's buffer; its main loop can be busy ~10 ms
++    static constexpr uint32_t ALT_MODEM_MIN_TX_GAP_MSEC = 10;
++    static bool altModemActive();
++
+     meshtastic_MeshPacket *sendingPacket = NULL; // The packet we are currently sending
+     uint32_t lastTxStart = 0L;
+ 
+diff --git a/src/mesh/RadioLibInterface.cpp b/src/mesh/RadioLibInterface.cpp
+index 588311a..487f660 100644
+--- a/src/mesh/RadioLibInterface.cpp
++++ b/src/mesh/RadioLibInterface.cpp
+@@ -1,5 +1,6 @@
+ #include "RadioLibInterface.h"
+ #include "ContentionStats.h"
++#include "PacketProfiler.h"
+ #include "modules/NexusModule.h"
+ #if MESHTASTIC_ENABLE_JENCORE_SNIFFER
+ #include "FSCommon.h"
+@@ -85,6 +86,7 @@ RadioLibInterface::RadioLibInterface(LockingArduinoHal *hal, RADIOLIB_PIN_TYPE c
+ 
+ void INTERRUPT_ATTR RadioLibInterface::isrLevel0Common(PendingISR cause)
+ {
++    PROF_DO(prof::isrAt = micros());
+     instance->disableInterrupt();
+ 
+     BaseType_t xHigherPriorityTaskWoken;
+@@ -218,6 +220,7 @@ ErrorCode RadioLibInterface::send(meshtastic_MeshPacket *p)
+         packetPool.release(p);
+         return res;
+     }
++    PROF_DO(prof::mark(p->id, prof::SLOT_TXQ));
+ 
+     // set (random) transmit delay to let others reconfigure their radio,
+     // to avoid collisions and implement timing-based flooding
+@@ -423,21 +426,32 @@ void RadioLibInterface::deliverPendingIrqFromPoll(PendingISR cause)
+ 
+ void RadioLibInterface::onNotify(uint32_t notification)
+ {
++#ifdef PROFILE_PACKETS
++    if (prof::isrAt && (notification == ISR_TX || notification == ISR_RX)) {
++        prof::add(prof::ISR_LATENCY, micros() - prof::isrAt);
++        if (notification == ISR_TX)
++            prof::add(prof::TX_AIR, prof::isrAt - prof::txStartAt);
++        prof::isrAt = 0;
++    }
++#endif
+ 
+     switch (notification) {
+     case ISR_TX:
+-        handleTransmitInterrupt(); // completeSending() already restored the radio to the home config
+-        // Let the hooks pre-stage the radio for the NEXT queued packet. Not required for correctness -
+-        // TRANSMIT_DELAY_COMPLETED asks again before the scan, which is where the answer is acted on -
+-        // but it keeps the post-TX listen window on the channel we are about to transmit on.
+-        (void)RadioTxHooks::beforeTransmit(this, txQueue.getFront());
+-        startReceive();
+-        setTransmitDelay();
+-#if MESHTASTIC_ENABLE_JENCORE_SNIFFER
+-        // A JenCore frame never follows a transmission straight away: hold it back a few random slots.
+-        jencoreRepeater.afterTransmit(slotTimeMsec);
+-        wakeJenCoreRelay();
+-#endif
++        if (sendingPacket) {
++            if (uint32_t wait = nextFrameDelayMsec()) {
++                notifyLater(wait, NEXT_FRAME, true); // sendingPacket stays set, so nothing else is sent meanwhile
++                break;
++            }
++        }
++        onTransmitDone();
++        break;
++    case NEXT_FRAME:
++        PROF_DO(prof::txStartAt = micros());
++        if (sendingPacket && sendNextFrame()) {
++            enableInterrupt(isrTxLevel0);
++            break;
++        }
++        onTransmitDone();
+         break;
+     case ISR_RX:
+         // PREAMBLE_DETECTED/HEADER_VALID/SYNC are routed to the edge-triggered DIO1
+@@ -521,6 +535,22 @@ void RadioLibInterface::onNotify(uint32_t notification)
+     }
+ }
+ 
++void RadioLibInterface::onTransmitDone()
++{
++    handleTransmitInterrupt(); // completeSending() already restored the radio to the home config
++    // Let the hooks pre-stage the radio for the NEXT queued packet. Not required for correctness -
++    // TRANSMIT_DELAY_COMPLETED asks again before the scan, which is where the answer is acted on -
++    // but it keeps the post-TX listen window on the channel we are about to transmit on.
++    (void)RadioTxHooks::beforeTransmit(this, txQueue.getFront());
++    startReceive();
++    setTransmitDelay();
++#if MESHTASTIC_ENABLE_JENCORE_SNIFFER
++    // A JenCore frame never follows a transmission straight away: hold it back a few random slots.
++    jencoreRepeater.afterTransmit(slotTimeMsec);
++    wakeJenCoreRelay();
++#endif
++}
++
+ void RadioLibInterface::setTransmitDelay()
+ {
+     meshtastic_MeshPacket *p = txQueue.getFront();
+@@ -1136,6 +1166,7 @@ void RadioLibInterface::completeSending()
+ 
+ void RadioLibInterface::handleReceiveInterrupt()
+ {
++    PROF_SCOPE(RX_HANDLE);
+     // when this is called, we should be in receive mode - if we are not, just jump out instead of bombing. Possible Race
+     // Condition?
+     if (!isReceiving) {
+@@ -1165,7 +1196,9 @@ void RadioLibInterface::handleReceiveInterrupt()
+     }
+ #endif
+ 
+-    int state = iface->readData((uint8_t *)&radioBuffer, length);
++    int state = readFrame(length);
++    if (state == RX_FRAME_PARTIAL)
++        return;
+ #if ARCH_PORTDUINO
+     if (portduino_config.logoutputlevel == level_trace) {
+         printBytes("Raw incoming packet: ", (uint8_t *)&radioBuffer, length);
+@@ -1449,7 +1482,9 @@ bool RadioLibInterface::startSend(meshtastic_MeshPacket *txp)
+ 
+         size_t numbytes = beginSending(txp);
+ 
+-        int res = iface->startTransmit((uint8_t *)&radioBuffer, numbytes);
++        PROF_DO(prof::markEnd(txp->id, prof::SLOT_TXQ, prof::TX_QUEUE));
++        PROF_DO(prof::txStartAt = micros());
++        int res = startTransmitFrame(numbytes);
+         if (res != RADIOLIB_ERR_NONE) {
+             LOG_ERROR("startTransmit failed, error=%d", res);
+             RECORD_CRITICALERROR(meshtastic_CriticalErrorCode_RADIO_SPI_BUG);
+diff --git a/src/mesh/RadioLibInterface.h b/src/mesh/RadioLibInterface.h
+index 459e49e..33eb62d 100644
+--- a/src/mesh/RadioLibInterface.h
++++ b/src/mesh/RadioLibInterface.h
+@@ -112,7 +112,7 @@ class RadioLibInterface : public RadioInterface, protected concurrency::Notified
+ 
+   protected:
+     /// Used as our notification from the ISR
+-    enum PendingISR { ISR_NONE = 0, ISR_RX, ISR_TX, TRANSMIT_DELAY_COMPLETED, ISR_POLL_TICK };
++    enum PendingISR { ISR_NONE = 0, ISR_RX, ISR_TX, TRANSMIT_DELAY_COMPLETED, ISR_POLL_TICK, NEXT_FRAME };
+ 
+     /**
+      * Raw ISR handler that just calls our polymorphic method
+@@ -415,6 +415,9 @@ class RadioLibInterface : public RadioInterface, protected concurrency::Notified
+     void handleTransmitInterrupt();
+     void handleReceiveInterrupt();
+ 
++    /** Everything that follows the last frame of a transmission: release it, listen, schedule the next one */
++    void onTransmitDone();
++
+     static void timerCallback(void *p1, uint32_t p2);
+ 
+     virtual void onNotify(uint32_t notification) override;
+@@ -557,6 +560,16 @@ class RadioLibInterface : public RadioInterface, protected concurrency::Notified
+     /** If a raw (non-MeshPacket) frame was being transmitted, mark it finished and log its airtime. */
+     void completeRawSend();
+ 
++    // Frame hooks for modems whose frames are shorter than a Meshtastic packet (SX128x FLRC: 127 bytes).
++    // The default sends and reads the whole radioBuffer as one frame.
++    static const int RX_FRAME_PARTIAL = 1;
++    virtual int16_t startTransmitFrame(size_t numbytes) { return iface->startTransmit((uint8_t *)&radioBuffer, numbytes); }
++    /** >0 while more frames of the current packet remain: wait this long, then sendNextFrame() */
++    virtual uint32_t nextFrameDelayMsec() { return 0; }
++    virtual bool sendNextFrame() { return false; }
++    /** Read one received frame; RX_FRAME_PARTIAL means a fragment was stored and no packet is complete yet */
++    virtual int readFrame(size_t &length) { return iface->readData((uint8_t *)&radioBuffer, length); }
++
+     /**
+      * Add SNR data to received messages
+      */
+diff --git a/src/mesh/Router.cpp b/src/mesh/Router.cpp
+index 403bd2b..cdfc5e5 100644
+--- a/src/mesh/Router.cpp
++++ b/src/mesh/Router.cpp
+@@ -4,6 +4,7 @@
+ #include "MeshRadio.h"
+ #include "MeshService.h"
+ #include "NodeDB.h"
++#include "PacketProfiler.h"
+ #include "PositionPrecision.h"
+ #include "UptimeClock.h"
+ #include "gps/RTC.h"
+@@ -340,6 +341,7 @@ int32_t Router::runOnce()
+  */
+ void Router::enqueueReceivedMessage(meshtastic_MeshPacket *p)
+ {
++    PROF_DO(prof::mark(p->id, prof::SLOT_RQ));
+ #if HAS_NEXUS
+     // Nexus port: run the Nexus long-name tag hook on this packet before enqueueing.
+     if (meshtastic::nexusModule)
+@@ -988,6 +990,7 @@ bool decodesOnOurChannels(NodeNum from, PacketId id, ChannelHash channelHash, co
+ 
+ DecodeState perhapsDecode(meshtastic_MeshPacket *p)
+ {
++    PROF_SCOPE(DECODE);
+     concurrency::LockGuard g(cryptLock);
+ 
+     if (config.device.rebroadcast_mode == meshtastic_Config_DeviceConfig_RebroadcastMode_KNOWN_ONLY &&
+@@ -1308,6 +1311,7 @@ static bool ackNeedsPkcFallback(const meshtastic_MeshPacket *p, ChannelIndex chI
+  */
+ meshtastic_Routing_Error perhapsEncode(meshtastic_MeshPacket *p)
+ {
++    PROF_SCOPE(ENCODE);
+     concurrency::LockGuard g(cryptLock);
+ 
+     int16_t hash;
+@@ -1779,6 +1783,8 @@ void Router::dispatchReceived(meshtastic_MeshPacket *p, RxSource src)
+ 
+ void Router::perhapsHandleReceived(meshtastic_MeshPacket *p)
+ {
++    PROF_DO(prof::markEnd(p->id, prof::SLOT_RQ, prof::ROUTER_QUEUE));
++    PROF_SCOPE(ROUTER_HANDLE);
+ #if ARCH_PORTDUINO
+     // Even ignored packets get logged in the trace
+     if (portduino_config.traceFilename != "" || portduino_config.logoutputlevel == level_trace) {
+diff --git a/src/mesh/SX128xInterface.cpp b/src/mesh/SX128xInterface.cpp
+index 1797395..0f4808d 100644
+--- a/src/mesh/SX128xInterface.cpp
++++ b/src/mesh/SX128xInterface.cpp
+@@ -145,8 +145,11 @@ template <typename T> int16_t SX128xInterface<T>::programAltModemFSK()
+     }
+     // Uniform Nexus wire profile (Jenny ruling 2026-10-14): pin sync/whitening/NRZ/ CRC —
+     // note §7: SX128x GFSK whitening defaults ON (silent killer), so OFF must be explicit.
+-    uint8_t wireSync[2] = {0x12, 0xAD};
+-    err = lora.setSyncWord(wireSync, sizeof(wireSync));
++    // 4-byte sync on SX128x: with the 2-byte 0x12AD the receiver kept locking onto noise and missed every real packet
++    // from 500 kbps up (bench: 0/20 at 500/1000/2000k, 20/20 with this word); only 250k still got through.
++    uint8_t altSync[sizeof(sx128xAltSyncWord)];
++    memcpy(altSync, sx128xAltSyncWord, sizeof(altSync));
++    err = lora.setSyncWord(altSync, sizeof(altSync));
+     if (err != RADIOLIB_ERR_NONE) {
+         LOG_ERROR("SX128X GFSK setSyncWord %s%d", radioLibErr, err);
+         return err;
+@@ -186,21 +189,32 @@ template <typename T> int16_t SX128xInterface<T>::programAltModemFLRC()
+ {
+     const meshtastic::NexusModule::NexusAltModem &m = meshtastic::nexusModule->altModem;
+     limitPower(SX128X_MAX_POWER);
+-    uint8_t cr = (m.cr == 2) ? RADIOLIB_SX128X_FLRC_CR_1_2
+-               : (m.cr == 3) ? RADIOLIB_SX128X_FLRC_CR_3_4
+-                             : RADIOLIB_SX128X_FLRC_CR_1_0;
++    // beginFLRC()/setCodingRate() take the shorthand 2|3|4 and map it to the register value themselves; passing
++    // RADIOLIB_SX128X_FLRC_CR_* (0x00/0x02/0x04) made CR 1/2 an invalid 0 and turned CR 3/4 into 1/2
++    uint8_t cr = (m.cr == 2 || m.cr == 3) ? m.cr : 4;
+     uint8_t shaping = (m.bt == 0) ? RADIOLIB_SHAPING_NONE
+                     : (m.bt == 1) ? RADIOLIB_SHAPING_0_3
+                                   : RADIOLIB_SHAPING_0_5;
+     // beginFLRC(freq MHz, br kbps, cr selector, pwr dBm, preamble bits, shaping) —
+     // explicit params so both sides of an SX128x pair always match (Phase 2 ruling).
+-    int16_t err = lora.beginFLRC(getFreq(), (uint16_t)m.brKbps, cr, power, m.preambleBits, shaping);
++    // Bench: 16- and 24-bit preambles lost every packet at 650 kbps CR 1/2; 32 bits worked at 260/650/1300k, all CRs.
++    // Both ends run this same floor, so a pair still matches.
++    uint16_t preambleBits = max(m.preambleBits, FLRC_MIN_PREAMBLE_BITS);
++    int16_t err = lora.beginFLRC(getFreq(), (uint16_t)m.brKbps, cr, power, preambleBits, shaping);
+     if (err != RADIOLIB_ERR_NONE) {
+         LOG_ERROR("SX128X beginFLRC(%.3fM/%.1fk/cr=%u/%d/%u) %s%d", getFreq(), m.brKbps, cr,
+-                  power, m.preambleBits, radioLibErr, err);
++                  power, preambleBits, radioLibErr, err);
+         return err;
+     }
+-    err = lora.variablePacketLengthMode(RADIOLIB_SX128X_MAX_PACKET_LENGTH);
++    // RadioLib's default FLRC word 2D 01 4B 1D (a run of seven zeros) left CR 1/2 and 3/4 failing CRC on every packet
++    uint8_t altSync[sizeof(sx128xAltSyncWord)];
++    memcpy(altSync, sx128xAltSyncWord, sizeof(altSync));
++    err = lora.setSyncWord(altSync, sizeof(altSync));
++    if (err != RADIOLIB_ERR_NONE) {
++        LOG_ERROR("SX128X FLRC setSyncWord %s%d", radioLibErr, err);
++        return err;
++    }
++    err = lora.variablePacketLengthMode(FLRC_MAX_FRAME); // FLRC payloads stop at 127 bytes
+     if (err != RADIOLIB_ERR_NONE) {
+         LOG_ERROR("SX128X FLRC variablePacketLengthMode %s%d", radioLibErr, err);
+         return err;
+@@ -511,7 +525,7 @@ template <typename T> void SX128xInterface<T>::startReceive()
+     int16_t err = trySetStandby();
+     if (err == RADIOLIB_ERR_NONE) {
+         if (meshtastic::nexusModule && meshtastic::nexusModule->altModem.mode != 0) {
+-            (void)lora.variablePacketLengthMode(RADIOLIB_SX128X_MAX_PACKET_LENGTH);
++            (void)lora.variablePacketLengthMode(maxFrameLen());
+         }
+         err = lora.startReceive(RADIOLIB_SX128X_RX_TIMEOUT_INF, MESHTASTIC_RADIOLIB_IRQ_RX_FLAGS);
+     }
+@@ -520,7 +534,7 @@ template <typename T> void SX128xInterface<T>::startReceive()
+         LOG_ERROR("SX128X startReceive %s%d", radioLibErr, err);
+         if (maybeRecoverChipStateLoss()) {
+             if (meshtastic::nexusModule && meshtastic::nexusModule->altModem.mode != 0) {
+-                (void)lora.variablePacketLengthMode(RADIOLIB_SX128X_MAX_PACKET_LENGTH);
++                (void)lora.variablePacketLengthMode(maxFrameLen());
+             }
+             err = lora.startReceive(RADIOLIB_SX128X_RX_TIMEOUT_INF, MESHTASTIC_RADIOLIB_IRQ_RX_FLAGS);
+         }
+@@ -557,8 +571,11 @@ template <typename T> bool SX128xInterface<T>::isChannelActive()
+     // drops getRSSI to the standby floor and makes channel activity detection blind.
+     if (meshtastic::nexusModule && meshtastic::nexusModule->altModem.mode != 0) {
+         float rssi = lora.getRSSI(false); // instantaneous, not last-packet status
+-        LOG_TRACE("SX128X alt-modem channel sniff RSSI=%.1f dBm", rssi);
+-        if (rssi > -100.0f)
++        // A fixed -100 dBm sits inside the noise of the wide GFSK/FLRC filters (2.4 MHz at 1-2 Mbps), so nodes kept
++        // backing off on an idle channel. Busy = 10 dB over the larger of the mode's sensitivity and the noise floor.
++        float threshold = max(altSensitivityDbm(), (float)getNoiseFloor()) + 10.0f;
++        LOG_TRACE("SX128X alt-modem channel sniff RSSI=%.1f dBm (busy above %.1f)", rssi, threshold);
++        if (rssi > threshold)
+             return true;
+         int16_t result = trySetStandby();
+         if (result != RADIOLIB_ERR_NONE) {
+@@ -632,4 +649,124 @@ template <typename T> int16_t SX128xInterface<T>::getCurrentRSSI()
+     float rssi = lora.getRSSI(false);
+     return (int16_t)round(rssi);
+ }
++
++/*
++ * FLRC framing: byte 0 = 0x00 for an unfragmented packet, otherwise
++ * 1 | index(2 bits) | count-1 (2 bits) | tag (3 bits), followed by an equal share of the packet so no
++ * fragment falls under FLRC's 6-byte minimum.
++ */
++template <typename T> int16_t SX128xInterface<T>::startTransmitFrame(size_t numbytes)
++{
++    if (!usesFragments())
++        return RadioLibInterface::startTransmitFrame(numbytes);
++
++    txFragLen = numbytes;
++    txFragCount = fragmentCount(numbytes);
++    txFragNext = 0;
++    txFragTag = (txFragTag + 1) & 0x07;
++    return transmitFragment();
++}
++
++template <typename T> int16_t SX128xInterface<T>::transmitFragment()
++{
++    size_t per = (txFragLen + txFragCount - 1) / txFragCount;
++    size_t off = txFragNext * per;
++    size_t len = min(per, txFragLen - off);
++
++    frameBuf[0] = txFragCount == 1 ? 0 : (0x80 | (txFragNext << 5) | ((txFragCount - 1) << 3) | txFragTag);
++    memcpy(frameBuf + 1, ((uint8_t *)&radioBuffer) + off, len);
++    txFragNext++;
++    return lora.startTransmit(frameBuf, len + 1);
++}
++
++template <typename T> uint32_t SX128xInterface<T>::nextFrameDelayMsec()
++{
++    return (usesFragments() && txFragNext < txFragCount) ? FRAG_GAP_MSEC : 0;
++}
++
++template <typename T> bool SX128xInterface<T>::sendNextFrame()
++{
++    if (!usesFragments() || txFragNext >= txFragCount)
++        return false;
++
++    int16_t res = transmitFragment();
++    if (res != RADIOLIB_ERR_NONE) {
++        LOG_ERROR("FLRC fragment %u/%u failed, error=%d", txFragNext, txFragCount, res);
++        txFragNext = txFragCount;
++        return false;
++    }
++    return true;
++}
++
++template <typename T> int SX128xInterface<T>::readFrame(size_t &length)
++{
++    if (!usesFragments())
++        return RadioLibInterface::readFrame(length);
++
++    if (length < 2 || length > FLRC_MAX_FRAME)
++        return RADIOLIB_ERR_PACKET_TOO_LONG;
++    int state = lora.readData(frameBuf, length);
++    if (state != RADIOLIB_ERR_NONE)
++        return state;
++
++    uint8_t hdr = frameBuf[0];
++    size_t len = length - 1;
++    if (!(hdr & 0x80)) {
++        memcpy(&radioBuffer, frameBuf + 1, len);
++        length = len;
++        return RADIOLIB_ERR_NONE;
++    }
++
++    uint8_t idx = (hdr >> 5) & 0x03, count = ((hdr >> 3) & 0x03) + 1, tag = hdr & 0x07;
++    if (idx == 0) {
++        rxFragTag = tag;
++        rxFragCount = count;
++        rxFragNext = 0;
++        rxFragLen = 0;
++    }
++    if (idx != rxFragNext || tag != rxFragTag || count != rxFragCount || rxFragLen + len > sizeof(rxFrag)) {
++        LOG_DEBUG("Drop FLRC fragment %u/%u", idx, count);
++        rxFragNext = 0xFF;
++        return RX_FRAME_PARTIAL;
++    }
++    memcpy(rxFrag + rxFragLen, frameBuf + 1, len);
++    rxFragLen += len;
++    if (++rxFragNext < rxFragCount)
++        return RX_FRAME_PARTIAL;
++
++    memcpy(&radioBuffer, rxFrag, rxFragLen);
++    length = rxFragLen;
++    rxFragNext = 0xFF;
++    return RADIOLIB_ERR_NONE;
++}
++
++/// Approximate SX1280 sensitivity (datasheet tables) of the active GFSK/FLRC setting, for carrier sense
++template <typename T> float SX128xInterface<T>::altSensitivityDbm()
++{
++    const auto &m = meshtastic::nexusModule->altModem;
++    if (m.mode == 2) {
++        float s = m.brKbps >= 1300 ? -99 : m.brKbps >= 1000 ? -100 : m.brKbps >= 520 ? -104 : -106; // CR 1/2
++        return s + (m.cr == 3 ? 2 : m.cr == 4 ? 3 : 0);
++    }
++    return m.brKbps >= 2000 ? -83 : m.brKbps >= 1600 ? -85 : m.brKbps >= 1000 ? -87 : m.brKbps >= 800 ? -88
++           : m.brKbps >= 500 ? -90 : m.brKbps >= 250 ? -92 : -94;
++}
++
++/// FLRC time on air from the SX1280 datasheet (7.3.4), per fragment plus the gaps between fragments
++template <typename T> uint32_t SX128xInterface<T>::flrcPacketTimeMsec(uint32_t pl)
++{
++    const auto &m = meshtastic::nexusModule->altModem;
++    uint32_t crNum = m.cr == 2 ? 1 : (m.cr == 3 ? 3 : 1), crDen = m.cr == 2 ? 2 : (m.cr == 3 ? 4 : 1);
++    uint8_t count = fragmentCount(pl);
++    uint32_t per = (pl + count - 1) / count;
++    uint32_t us = 0;
++    for (uint8_t i = 0; i < count; i++) {
++        uint32_t len = min(per, pl - i * per) + 1;
++        uint32_t uncoded = max(m.preambleBits, FLRC_MIN_PREAMBLE_BITS) + 21 + 32 + 16;
++        uint32_t raw = (len + 2) * 8 + (crNum == crDen ? 0 : 6);
++        us += (uint32_t)((uncoded + raw * crDen / crNum) * 1000 / m.brKbps);
++    }
++    us += (count - 1) * FRAG_GAP_MSEC * 1000;
++    return max((uint32_t)1, (us + 999) / 1000);
++}
+ #endif
+\ No newline at end of file
+diff --git a/src/mesh/SX128xInterface.h b/src/mesh/SX128xInterface.h
+index bd1897d..ce7f46e 100644
+--- a/src/mesh/SX128xInterface.h
++++ b/src/mesh/SX128xInterface.h
+@@ -79,9 +79,39 @@ template <class T> class SX128xInterface : public RadioLibInterface
+     virtual int16_t setOutputPowerLive(int8_t powerDb) override;
+     virtual int16_t setSpreadingFactorLive(uint8_t targetSf, int8_t targetPwr = 0x7F) override;
+ 
+-    uint32_t getPacketTime(uint32_t pl, bool received) override { return computePacketTime(lora, pl, received); }
++    uint32_t getPacketTime(uint32_t pl, bool received) override
++    {
++        return usesFragments() ? flrcPacketTimeMsec(pl) : computePacketTime(lora, pl, received);
++    }
++
++    // FLRC frames carry at most 127 bytes, so FLRC packets get a 1-byte fragment header and are split when needed.
++    int16_t startTransmitFrame(size_t numbytes) override;
++    uint32_t nextFrameDelayMsec() override;
++    bool sendNextFrame() override;
++    int readFrame(size_t &length) override;
+ 
+   private:
++    static const uint8_t FLRC_MAX_FRAME = 127;
++    // GFSK and FLRC sync word (SX128x-only links): 4 bytes, no long runs of equal bits
++    static constexpr uint8_t sx128xAltSyncWord[4] = {0x2D, 0x4B, 0xD4, 0x93};
++    // The receiver reads each fragment from its main loop before the next one overwrites the chip's buffer
++    static const uint8_t FRAG_GAP_MSEC = 10;
++
++    uint8_t frameBuf[FLRC_MAX_FRAME];
++    size_t txFragLen = 0;
++    uint8_t txFragCount = 0, txFragNext = 0, txFragTag = 0;
++    uint8_t rxFrag[sizeof(RadioBuffer)];
++    size_t rxFragLen = 0;
++    uint8_t rxFragTag = 0, rxFragCount = 0, rxFragNext = 0xFF;
++
++    static bool usesFragments() { return meshtastic::nexusModule && meshtastic::nexusModule->altModem.mode == 2; }
++    static size_t maxFrameLen() { return usesFragments() ? FLRC_MAX_FRAME : RADIOLIB_SX128X_MAX_PACKET_LENGTH; }
++    static uint8_t fragmentCount(size_t len) { return (len + FLRC_MAX_FRAME - 2) / (FLRC_MAX_FRAME - 1); }
++    int16_t transmitFragment();
++    uint32_t flrcPacketTimeMsec(uint32_t pl);
++    float altSensitivityDbm();
++    static constexpr uint16_t FLRC_MIN_PREAMBLE_BITS = 32;
++
+     /** Program all modem parameters into the chip; returns the first RadioLib error, or RADIOLIB_ERR_NONE */
+     int16_t programModemParams();
+ 
+diff --git a/src/mesh/StreamAPI.cpp b/src/mesh/StreamAPI.cpp
+index 7d3ca39..dd7fc9a 100644
+--- a/src/mesh/StreamAPI.cpp
++++ b/src/mesh/StreamAPI.cpp
+@@ -4,6 +4,7 @@
+ 
+ #include "PowerFSM.h"
+ #include "StreamAPI.h"
++#include "PacketProfiler.h"
+ #include "Throttle.h"
+ #include "concurrency/LockGuard.h"
+ #include "gps/RTC.h"
+@@ -140,7 +141,9 @@ int32_t StreamAPI::readStream()
+         bool recentRx = Throttle::isWithinTimespanMs(lastRxMsec, 2000);
+         return recentRx ? 5 : 250;
+     } else {
+-        while (stream->available()) { // Currently we never want to block
++        bool handledPacket = false;
++        // One ToRadio per run: a burst from the client would otherwise hold the main loop (and the radio) for its whole length
++        while (!handledPacket && stream->available()) {
+             int cInt = stream->read();
+             if (cInt < 0)
+                 break; // We ran out of characters (even though available said otherwise) - this can happen on rf52 adafruit
+@@ -182,6 +185,7 @@ int32_t StreamAPI::readStream()
+ 
+                         // If we didn't just fail the packet and we now have the right # of bytes, parse it
+                         handleToRadio(rxBuf + HEADER_LEN, len);
++                        handledPacket = true;
+                     }
+             }
+         }
+@@ -232,6 +236,7 @@ bool StreamAPI::writeFrame(uint8_t *buf, size_t len, bool bestEffort)
+ /// Emit the prepared main PhoneAPI payload as required output.
+ bool StreamAPI::emitTxBuffer(size_t len)
+ {
++    PROF_SCOPE(API_EMIT);
+     return writeFrame(txBuf, len, false);
+ }
+ 
+diff --git a/src/modules/NexusCommands.cpp b/src/modules/NexusCommands.cpp
+index 899778b..182dcd1 100644
+--- a/src/modules/NexusCommands.cpp
++++ b/src/modules/NexusCommands.cpp
+@@ -5899,6 +5899,16 @@ void NexusModule::handleNexusCommand(const meshtastic_MeshPacket &mp, const char
+                 bool crOk = (crc == 2 || crc == 3 || crc == 4);
+                 bool btOk = (bt >= 0 && bt <= 2);
+                 bool preOk = (pre >= 4 && pre <= 1024);
++                if (radioType == SX1280_RADIO) {
++                    // A value beginFLRC() rejects leaves the radio unconfigured and the node deaf until SETFLRC OFF,
++                    // so check what the SX128x accepts here: its rates, no BT 0.3, preamble 4-32 bits in steps of 4
++                    static const float kFlrcRates[] = {260, 325, 520, 650, 1000, 1300};
++                    brOk = false;
++                    for (float r : kFlrcRates)
++                        brOk |= (br == r);
++                    btOk = (bt == 0 || bt == 2);
++                    preOk = (pre >= 4 && pre <= 32 && pre % 4 == 0);
++                }
+                 if (brOk && crOk && btOk && preOk) {
+                     altModem.mode = 2;
+                     altModem.brKbps = br;
+@@ -5918,6 +5928,9 @@ void NexusModule::handleNexusCommand(const meshtastic_MeshPacket &mp, const char
+                     snprintf(replyMsg, sizeof(replyMsg),
+                              "JT: FLRC accepted. BR:%.1fk CR:%s BT:%d PRE:%d. Applying LIVE in 5s.",
+                              br, crName, bt, pre);
++                } else if (radioType == SX1280_RADIO) {
++                    snprintf(replyMsg, sizeof(replyMsg),
++                             "JT: Invalid FLRC params (SX128x BR:260|325|520|650|1000|1300k, CR:2|3|4, BT:0|2, PRE:4-32 step 4)");
+                 } else {
+                     snprintf(replyMsg, sizeof(replyMsg),
+                              "JT: Invalid FLRC params (BR:1-2600k, CR:2|3|4 = 1/2|3/4|uncoded, BT:0|1|2, PRE:4-1024)");
+@@ -5927,11 +5940,16 @@ void NexusModule::handleNexusCommand(const meshtastic_MeshPacket &mp, const char
+                 // Per Carson's rule (Semtech SX1261-2 §6.2.1 / LR1110 §8.2.1), DSB receiver filter
+                 // bandwidth must satisfy rxBw >= br + 2*freqDev (e.g. 50 kbps + 2*25 kHz = 100 kHz -> 117.3 kHz step).
+                 const char *p = sub;
++                // SX128x GFSK: discrete rates 125-2000 kbps, deviation 62.5-1000 kHz and between br/8 and 2*br
++                // (RadioLib modulation-index table); the sub-GHz ranges below would cap it at 300 kbps
++                const bool sx128x = (radioType == SX1280_RADIO);
+                 float br = atof(p);
+                 while (*p && *p != ' ') p++;
+                 while (*p == ' ') p++;
+-                float dev = (*p) ? atof(p) : ((br >= 3.0f && br <= 300.0f) ? (br * 0.5f) : 25.0f);
+-                if (dev > 200.0f) dev = 200.0f;
++                float dev = (*p) ? atof(p)
++                                 : sx128x ? max(br * 0.25f, 62.5f) // modulation index 0.5
++                                          : ((br >= 3.0f && br <= 300.0f) ? (br * 0.5f) : 25.0f);
++                if (!sx128x && dev > 200.0f) dev = 200.0f;
+                 while (*p && *p != ' ') p++;
+                 while (*p == ' ') p++;
+                 float rbw = (*p) ? atof(p) : 0.0f;
+@@ -5956,6 +5974,15 @@ void NexusModule::handleNexusCommand(const meshtastic_MeshPacket &mp, const char
+                 bool devOk = (dev >= 1.5f && dev <= 200.0f); // SX126x/GFSK deviation limit
+                 bool rbwOk = (rbw >= 4.8f && rbw <= 500.0f); // SX126x GFSK RX filter
+                 bool preOk = (pre >= 4 && pre <= 1024);
++                if (sx128x) {
++                    static const float kSx128xRates[] = {125, 250, 400, 500, 800, 1000, 1600, 2000};
++                    brOk = false;
++                    for (float r : kSx128xRates)
++                        brOk |= (br == r);
++                    devOk = (dev >= 62.5f && dev <= 1000.0f && dev >= br / 8.0f && dev <= 2.0f * br);
++                    rbwOk = true; // the SX128x picks its RX bandwidth from the bit rate
++                    preOk = (pre >= 4 && pre <= 32 && pre % 4 == 0);
++                }
+                 if (brOk && devOk && rbwOk && preOk) {
+                     altModem.mode = 1;
+                     altModem.brKbps = br;
+@@ -5972,6 +5999,10 @@ void NexusModule::handleNexusCommand(const meshtastic_MeshPacket &mp, const char
+                     snprintf(replyMsg, sizeof(replyMsg),
+                              "JT: FSK accepted. BR:%.1fk DEV:%.1fk BW:%.1fk PRE:%d. Applying LIVE in 5s.",
+                              br, dev, rbw, pre);
++                } else if (sx128x) {
++                    snprintf(replyMsg, sizeof(replyMsg),
++                             "JT: Invalid FSK params (SX128x BR:125|250|400|500|800|1000|1600|2000k, DEV:62.5-1000k and "
++                             "BR/8-2*BR, PRE:4-32 step 4)");
+                 } else {
+                     snprintf(replyMsg, sizeof(replyMsg),
+                              "JT: Invalid FSK params (BR:0.6-300k, DEV:1.5-200k, BW:4.8-500k, PRE:4-1024)");
+diff --git a/src/platform/nrf52/NRF52Bluetooth.cpp b/src/platform/nrf52/NRF52Bluetooth.cpp
+index 744dd9c..6258984 100644
+--- a/src/platform/nrf52/NRF52Bluetooth.cpp
++++ b/src/platform/nrf52/NRF52Bluetooth.cpp
+@@ -38,8 +38,9 @@ static BLEUart rnodeBleUart;
+ static void rnode_nrf52_ble_write(const uint8_t *data, size_t len)
+ {
+     if (rnodeBleUart.notifyEnabled()) {
++        // Unbuffered BLEUart: write() notifies directly. flushTXD() reads the TX FIFO, which only exists after
++        // bufferTXD(true) - with it NULL the node hard-faulted on its first KISS reply.
+         rnodeBleUart.write(data, len);
+-        rnodeBleUart.flushTXD();
+     }
+ }
+ #endif
+diff --git a/src/platform/nrf52/NRF52CryptoEngine.cpp b/src/platform/nrf52/NRF52CryptoEngine.cpp
+index 5a2bcca..b9999e6 100644
+--- a/src/platform/nrf52/NRF52CryptoEngine.cpp
++++ b/src/platform/nrf52/NRF52CryptoEngine.cpp
+@@ -1,6 +1,27 @@
+ #include "CryptoEngine.h"
+ #include "configuration.h"
+ #include <Adafruit_nRFCrypto.h>
++
++// SaSi_LibInit() (nRFCrypto.begin) costs ~95 ms of the main loop. Starting and stopping CryptoCell around every
++// AES block or RNG fill put that on every packet - a DM's nonce fill stopped it and decrypting the ack restarted it.
++// Keep it up while in use and power it down after a short idle period instead.
++static const uint32_t CRYPTOCELL_IDLE_MSEC = 2000;
++static uint32_t cryptoCellLastUse;
++
++void nrf52CryptoCellAcquire()
++{
++    nRFCrypto.begin(); // no-op while already up
++    cryptoCellLastUse = millis() | 1;
++}
++
++void nrf52CryptoCellIdleCheck()
++{
++    if (cryptoCellLastUse && millis() - cryptoCellLastUse > CRYPTOCELL_IDLE_MSEC) {
++        nRFCrypto.end();
++        cryptoCellLastUse = 0;
++    }
++}
++
+ class NRF52CryptoEngine : public CryptoEngine
+ {
+   public:
+@@ -14,7 +35,7 @@ class NRF52CryptoEngine : public CryptoEngine
+             // CryptoCell only accelerates AES-128; AES-256 uses the shared software CTR.
+             CryptoEngine::encryptAESCtr(_key, _nonce, numBytes, bytes);
+         } else if (_key.length > 0) {
+-            nRFCrypto.begin();
++            nrf52CryptoCellAcquire();
+             nRFCrypto_AES ctx;
+             // Must not be uint8_t: blockLen() rounds up to the AES block size, so numBytes in
+             // 241..256 yields 256, which truncates to 0 and leaves Process() writing numBytes
+@@ -24,7 +45,6 @@ class NRF52CryptoEngine : public CryptoEngine
+             ctx.begin();
+             ctx.Process((char *)bytes, numBytes, _nonce, _key.bytes, _key.length, encBuf, ctx.encryptFlag, ctx.ctrMode);
+             ctx.end();
+-            nRFCrypto.end();
+             memcpy(bytes, encBuf, numBytes);
+         }
+     }
+diff --git a/src/platform/nrf52/main-nrf52.cpp b/src/platform/nrf52/main-nrf52.cpp
+index 31224cb..5c0957c 100644
+--- a/src/platform/nrf52/main-nrf52.cpp
++++ b/src/platform/nrf52/main-nrf52.cpp
+@@ -384,6 +384,8 @@ void checkSDEvents()
+     }
+ }
+ 
++void nrf52CryptoCellIdleCheck(); // NRF52CryptoEngine.cpp
++
+ void nrf52Loop()
+ {
+     {
+@@ -394,6 +396,7 @@ void nrf52Loop()
+         }
+     }
+     nrfx_wdt_channel_feed(&nrfx_wdt, nrfx_wdt_channel_id_nrf52_main);
++    nrf52CryptoCellIdleCheck();
+ 
+     if (nrf52Bluetooth) {
+         nrf52Bluetooth->tick();
+@@ -605,6 +608,10 @@ void enterDfuMode()
+ #ifdef NRF_USE_SERIAL_DFU
+     enterSerialDfu();
+ #else
++#ifdef NRF52_PROMICRO_DIY
++    // Test-bench addition: this board's UF2 bootloader also needs its RAM double-reset magic to stay in DFU
++    *(volatile uint32_t *)0x20007F7C = 0x5A1AD5;
++#endif
+     enterUf2Dfu();
+ #endif
+ }
+diff --git a/variants/nrf52840/diy/nrf52_promicro_diy_e28/variant.h b/variants/nrf52840/diy/nrf52_promicro_diy_e28/variant.h
+index de4f8ea..28acc49 100644
+--- a/variants/nrf52840/diy/nrf52_promicro_diy_e28/variant.h
++++ b/variants/nrf52840/diy/nrf52_promicro_diy_e28/variant.h
+@@ -89,6 +89,8 @@ NRF52 PRO MICRO PIN ASSIGNMENT (E28 Variant)
+ 
+ #define PIN_GPS_EN (0 + 24) // P0.24
+ #define GPS_UBLOX
++// Most of these boards have no GNSS; probing an absent module blocks the main loop for up to 1 s at a time
++#define GPS_DEFAULT_NOT_PRESENT 1
+ // define GPS_DEBUG
+ 
+ // UART interfaces

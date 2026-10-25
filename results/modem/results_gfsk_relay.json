@@ -1,0 +1,268 @@
+{
+ "modem": "gfsk",
+ "pl": 255,
+ "pwr": 0,
+ "relay": true,
+ "results": [
+  {
+   "mode": "125k BW300",
+   "nominal_kbps": 125,
+   "pl": 255,
+   "toa_us": 16904,
+   "relay": {
+    "size": 41666,
+    "sha_ok": true,
+    "mismatch": 0,
+    "e2e_kbps": 51.73534050631535,
+    "radio_kbps": 52.07,
+    "host_s": 6.442945899994811,
+    "pkts": 166,
+    "retries": 0,
+    "dupfwd": 0,
+    "radio_resets": 0,
+    "relayed": 166,
+    "fwdretx": 0
+   }
+  },
+  {
+   "mode": "250k BW300",
+   "nominal_kbps": 250,
+   "pl": 255,
+   "toa_us": 8452,
+   "relay": {
+    "size": 68266,
+    "sha_ok": true,
+    "mismatch": 0,
+    "e2e_kbps": 99.00233926165372,
+    "radio_kbps": 99.75,
+    "host_s": 5.516314099979354,
+    "pkts": 272,
+    "retries": 0,
+    "dupfwd": 0,
+    "radio_resets": 0,
+    "relayed": 272,
+    "fwdretx": 0
+   }
+  },
+  {
+   "mode": "250k BW600",
+   "nominal_kbps": 250,
+   "pl": 255,
+   "toa_us": 8452,
+   "relay": {
+    "size": 68266,
+    "sha_ok": true,
+    "mismatch": 0,
+    "e2e_kbps": 99.1253709932239,
+    "radio_kbps": 99.89,
+    "host_s": 5.5094673999992665,
+    "pkts": 272,
+    "retries": 0,
+    "dupfwd": 0,
+    "radio_resets": 0,
+    "relayed": 272,
+    "fwdretx": 0
+   }
+  },
+  {
+   "mode": "400k BW1200",
+   "nominal_kbps": 400,
+   "pl": 255,
+   "toa_us": 5282,
+   "relay": {
+    "size": 68266,
+    "sha_ok": true,
+    "mismatch": 0,
+    "e2e_kbps": 152.43957243365287,
+    "radio_kbps": 154.22,
+    "host_s": 3.5825868000101764,
+    "pkts": 272,
+    "retries": 0,
+    "dupfwd": 0,
+    "radio_resets": 0,
+    "relayed": 272,
+    "fwdretx": 0
+   }
+  },
+  {
+   "mode": "400k BW600",
+   "nominal_kbps": 400,
+   "pl": 255,
+   "toa_us": 5282,
+   "relay": {
+    "size": 68266,
+    "sha_ok": true,
+    "mismatch": 0,
+    "e2e_kbps": 150.49007068626588,
+    "radio_kbps": 152.2,
+    "host_s": 3.628996899991762,
+    "pkts": 272,
+    "retries": 0,
+    "dupfwd": 0,
+    "radio_resets": 0,
+    "relayed": 272,
+    "fwdretx": 0
+   }
+  },
+  {
+   "mode": "500k BW1200",
+   "nominal_kbps": 500,
+   "pl": 255,
+   "toa_us": 4226,
+   "relay": {
+    "size": 68266,
+    "sha_ok": true,
+    "mismatch": 0,
+    "e2e_kbps": 183.23912039523182,
+    "radio_kbps": 185.88,
+    "host_s": 2.980411600001389,
+    "pkts": 272,
+    "retries": 1,
+    "dupfwd": 0,
+    "radio_resets": 0,
+    "relayed": 272,
+    "fwdretx": 0
+   }
+  },
+  {
+   "mode": "500k BW600",
+   "nominal_kbps": 500,
+   "pl": 255,
+   "toa_us": 4226,
+   "relay": {
+    "size": 68266,
+    "sha_ok": true,
+    "mismatch": 0,
+    "e2e_kbps": 181.7918726574378,
+    "radio_kbps": 184.38,
+    "host_s": 3.004138700023759,
+    "pkts": 272,
+    "retries": 0,
+    "dupfwd": 0,
+    "radio_resets": 0,
+    "relayed": 272,
+    "fwdretx": 0
+   }
+  },
+  {
+   "mode": "800k BW1200",
+   "nominal_kbps": 800,
+   "pl": 255,
+   "toa_us": 2641,
+   "relay": {
+    "size": 68266,
+    "sha_ok": true,
+    "mismatch": 0,
+    "e2e_kbps": 267.5920503016172,
+    "radio_kbps": 273.2,
+    "host_s": 2.0408977000042796,
+    "pkts": 272,
+    "retries": 0,
+    "dupfwd": 0,
+    "radio_resets": 0,
+    "relayed": 272,
+    "fwdretx": 0
+   }
+  },
+  {
+   "mode": "800k BW2400",
+   "nominal_kbps": 800,
+   "pl": 255,
+   "toa_us": 2641,
+   "relay": {
+    "size": 68266,
+    "sha_ok": true,
+    "mismatch": 0,
+    "e2e_kbps": 268.1181847161372,
+    "radio_kbps": 273.58,
+    "host_s": 2.0368928000098094,
+    "pkts": 272,
+    "retries": 0,
+    "dupfwd": 0,
+    "radio_resets": 0,
+    "relayed": 272,
+    "fwdretx": 0
+   }
+  },
+  {
+   "mode": "1000k BW1200",
+   "nominal_kbps": 1000,
+   "pl": 255,
+   "toa_us": 2113,
+   "relay": {
+    "size": 68266,
+    "sha_ok": true,
+    "mismatch": 0,
+    "e2e_kbps": 315.29462515219984,
+    "radio_kbps": 323.03,
+    "host_s": 1.7321195999975316,
+    "pkts": 272,
+    "retries": 0,
+    "dupfwd": 0,
+    "radio_resets": 0,
+    "relayed": 272,
+    "fwdretx": 0
+   }
+  },
+  {
+   "mode": "1000k BW2400",
+   "nominal_kbps": 1000,
+   "pl": 255,
+   "toa_us": 2113,
+   "relay": {
+    "size": 68266,
+    "sha_ok": true,
+    "mismatch": 0,
+    "e2e_kbps": 315.5548488415187,
+    "radio_kbps": 323.4,
+    "host_s": 1.730691199976718,
+    "pkts": 272,
+    "retries": 0,
+    "dupfwd": 0,
+    "radio_resets": 0,
+    "relayed": 272,
+    "fwdretx": 0
+   }
+  },
+  {
+   "mode": "1600k BW2400",
+   "nominal_kbps": 1600,
+   "pl": 255,
+   "toa_us": 1320,
+   "relay": {
+    "size": 68266,
+    "sha_ok": true,
+    "mismatch": 0,
+    "e2e_kbps": 429.88895091186953,
+    "radio_kbps": 444.29,
+    "host_s": 1.2703932000149507,
+    "pkts": 272,
+    "retries": 0,
+    "dupfwd": 0,
+    "radio_resets": 0,
+    "relayed": 272,
+    "fwdretx": 0
+   }
+  },
+  {
+   "mode": "2000k BW2400",
+   "nominal_kbps": 2000,
+   "pl": 255,
+   "toa_us": 1056,
+   "relay": {
+    "size": 68266,
+    "sha_ok": true,
+    "mismatch": 0,
+    "e2e_kbps": 488.9910137195522,
+    "radio_kbps": 507.6,
+    "host_s": 1.1168466999952216,
+    "pkts": 272,
+    "retries": 0,
+    "dupfwd": 0,
+    "radio_resets": 0,
+    "relayed": 272,
+    "fwdretx": 0
+   }
+  }
+ ]
+}

@@ -1,0 +1,110 @@
+{
+ "FSK 1000 / 80B": {
+  "mode": "FSK 1000",
+  "size": 80,
+  "ack": {
+   "n": 20,
+   "acked": 20,
+   "lat_median_ms": 160.0431203842163
+  },
+  "stream": {
+   "sent": 20,
+   "received": 9,
+   "send_s": 0.5033698081970215,
+   "total_s": 5.217325210571289,
+   "kbps": 1.1040139856202849
+  },
+  "status": {
+   "A": [
+    "🔴 JT: FSK accepted. BR:1000.0k DEV:250.0k BW:467.0k PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FSK BR:1000.0k dev:250.0k bw:467.0k pre:16 | caps:FSK FLRC "
+   ],
+   "B": [
+    "🔴 JT: FSK accepted. BR:1000.0k DEV:250.0k BW:467.0k PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FSK BR:1000.0k dev:250.0k bw:467.0k pre:16 | caps:FSK FLRC "
+   ]
+  },
+  "rssi_median": -33
+ },
+ "FSK 1000 / 200B": {
+  "mode": "FSK 1000",
+  "size": 200,
+  "ack": {
+   "n": 20,
+   "acked": 20,
+   "lat_median_ms": 165.6550168991089
+  },
+  "stream": {
+   "sent": 20,
+   "received": 20,
+   "send_s": 1.003054141998291,
+   "total_s": 1.0435242652893066,
+   "kbps": 30.66531470749108
+  },
+  "status": {
+   "A": [
+    "🔴 JT: FSK accepted. BR:1000.0k DEV:250.0k BW:467.0k PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FSK BR:1000.0k dev:250.0k bw:467.0k pre:16 | caps:FSK FLRC "
+   ],
+   "B": [
+    "🔴 JT: FSK accepted. BR:1000.0k DEV:250.0k BW:467.0k PRE:16. Applying LIVE in 5s.",
+    "🔴 JT Alt Modem: FSK BR:1000.0k dev:250.0k bw:467.0k pre:16 | caps:FSK FLRC "
+   ]
+  },
+  "rssi_median": -33
+ },
+ "LORA / 80B": {
+  "mode": "LORA",
+  "size": 80,
+  "ack": {
+   "n": 20,
+   "acked": 20,
+   "lat_median_ms": 197.12722301483154
+  },
+  "stream": {
+   "sent": 20,
+   "received": 12,
+   "send_s": 0.501967191696167,
+   "total_s": 5.722013473510742,
+   "kbps": 1.3421848857143523
+  },
+  "status": {
+   "A": [
+    "🔴 JT: Alt modem disabled (back to LoRa). Applying in 5s...",
+    "🔴 JT Alt Modem: LORA BR:0.0k dev:0.0k bw:0.0k pre:0 | caps:FSK FLRC "
+   ],
+   "B": [
+    "🔴 JT: Alt modem disabled (back to LoRa). Applying in 5s...",
+    "🔴 JT Alt Modem: LORA BR:0.0k dev:0.0k bw:0.0k pre:0 | caps:FSK FLRC "
+   ]
+  },
+  "rssi_median": -33
+ },
+ "LORA / 200B": {
+  "mode": "LORA",
+  "size": 200,
+  "ack": {
+   "n": 20,
+   "acked": 20,
+   "lat_median_ms": 235.97943782806396
+  },
+  "stream": {
+   "sent": 20,
+   "received": 20,
+   "send_s": 1.0040786266326904,
+   "total_s": 1.3036603927612305,
+   "kbps": 24.546270008419977
+  },
+  "status": {
+   "A": [
+    "🔴 JT: Alt modem disabled (back to LoRa). Applying in 5s...",
+    "🔴 JT Alt Modem: LORA BR:0.0k dev:0.0k bw:0.0k pre:0 | caps:FSK FLRC "
+   ],
+   "B": [
+    "🔴 JT: Alt modem disabled (back to LoRa). Applying in 5s...",
+    "🔴 JT Alt Modem: LORA BR:0.0k dev:0.0k bw:0.0k pre:0 | caps:FSK FLRC "
+   ]
+  },
+  "rssi_median": -33
+ }
+}
