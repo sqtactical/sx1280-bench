@@ -7,8 +7,8 @@ The firmware changes themselves live in two forks:
 
 - Meshtastic 2.7.26 + FLRC/GFSK presets: [sqtactical/firmware `sx1280-fast-modems`](https://github.com/sqtactical/firmware/tree/sx1280-fast-modems)
   ([docs](https://github.com/sqtactical/firmware/blob/sx1280-fast-modems/docs/sx1280-fast-modems.md))
-- Jentastic `testing` + SETFSK/SETFLRC fixes: [sqtactical/jentastic `sx1280-fsk-flrc`](https://github.com/sqtactical/jentastic/tree/sx1280-fsk-flrc)
-  ([docs](https://github.com/sqtactical/jentastic/blob/sx1280-fsk-flrc/docs/sx1280-fsk-flrc.md))
+- Jentastic `testing` + SETFSK/SETFLRC fixes: [sqtactical/jentastic `sx12xx-fsk-flrc`](https://github.com/sqtactical/jentastic/tree/sx12xx-fsk-flrc) (now in Jentastic `testing`; original commits on `sx1280-fsk-flrc-26a0451`)
+  ([docs](https://github.com/sqtactical/jentastic/blob/sx12xx-fsk-flrc/docs/sx1280-fsk-flrc.md))
 
 ## Headline numbers
 
